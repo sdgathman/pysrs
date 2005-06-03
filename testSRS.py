@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.4  2004/08/26 03:31:38  stuart
+# Introduce sendmail socket map
+#
 # Revision 1.3  2004/03/25 00:02:21  stuart
 # FIXME where case smash test depends on day
 #
@@ -70,7 +73,7 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(sender,addr)
 
   def testCaseSmash(self):
-    srs = SRS.new(secret='shhhh!',separator='+')
+    srs = SRS.new(secret='shhhhh!',separator='+')
     # FIXME: whether case smashing occurs depends on what day it is.
     sender = 'mouse@fickle1.com'
     srsaddr = srs.forward(sender,'second.com')
@@ -142,7 +145,7 @@ class SRSTestCase(unittest.TestCase):
     sock.close()
     return res
 
-  def testDaemon(self,sockname='/tmp/srsd',secret="shhhh!"):
+  def testExim(self,sockname='/tmp/srsd',secret="shhhh!"):
     self.sockname = sockname
     self.daemon = Daemon(socket=sockname,secret=secret)
     server = threading.Thread(target=self.run2,name='srsd')
@@ -153,7 +156,7 @@ class SRSTestCase(unittest.TestCase):
     server.join()
     self.assertEqual(sender,addr)
 
-  def testSendmailMap(self):
+  def testProgMap(self):
     import envfrom2srs
     import srs2envtol
     orig = 'mickey<@orig.com.>'

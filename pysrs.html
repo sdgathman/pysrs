@@ -13,7 +13,7 @@ ALT="Viewable With Any Browser" BORDER="0"></A>
 	usemap="#banner_4" alt="Your vote?">
 <map name="banner_4">
   <area shape="rect" coords="330,25,426,59"
-  	href="http://www.sepschool.org/survey/" alt="I Disagree">
+  	href="http://education-survey.org/" alt="I Disagree">
   <area shape="rect" coords="234,28,304,57" href="http://sepschool.org/" alt="I Agree">
 </map>
 
@@ -22,13 +22,13 @@ ALT="Viewable With Any Browser" BORDER="0"></A>
 <h4 align=center>
 This web page is written by Stuart D. Gathman<br>and<br>sponsored by
 <a href="http://www.bmsi.com">Business Management Systems, Inc.</a> <br>
-Last updated Mar 24, 2004</h4>
+Last updated Jun 08, 2004</h4>
 
 <p>
 This is a <a href="http://www.python.org/">Python</a> implementation of
 the <a href="http://spf.pobox.com/srs.html">Sender Rewriting Scheme</a>.
 It is a fairly direct translation of the
-<a href="http://www.anarres.org/projects/srs/">draft implementation in Perl</a>
+<a href="http://www.libsrs2.org/">draft implementation in Perl</a>
 by Shevek.  It includes a test suite, which currently checks four
 levels of forwarding and subsequent reversal for the Guarded, DB, and
 Reversible implementations.
@@ -70,7 +70,8 @@ HACK(`pysrs',`mydomain.com')dnl
         file which has one recipient MTA per line.
 <li>       The argument to pysrs is the domain that your SRS addresses bear
 	(i.e. if your SRS addresses are srs0=mumble-jumble-toto@mydomain.com,
-	then the argument is mydomain.com).
+	then the argument is mydomain.com).  This overrides fwdomain in
+	/etc/mail/pysrs.cfg.
 <li>       NO_SRS_FROM_LOCAL : if this is set (define line present), then
         no SRS is done if sender is local (i.e. his domain is in 
         /etc/mail/local-host-names)
@@ -79,13 +80,22 @@ HACK(`pysrs',`mydomain.com')dnl
 <h3>Downloads</h3>
 
 <menu>
+<li> <a href="pysrs-0.30.9.tar.gz">pysrs-0.30.9.tar.gz</a><br>
+Support sendmail socketmap.
+<a href="/linux/pysrs-0.30.9-1.noarch.rpm">pysrs-0.30.9-1.noarch.rpm</a><br>
+Redhat binary RPM.<br>
+<a href="/linux/pysrs-0.30.9-1.src.rpm">pysrs-0.30.9-1.src.rpm</a><br>
+Redhat source RPM.  Installs initscript pysrs daemon.
+<li> <a href="pysrs-0.30.8.tar.gz">pysrs-0.30.8.tar.gz</a><br>
+Use HMAC algorithm instead of straight SHA-1 to match reference implementation.<br>
+<a href="/linux/pysrs-0.30.8-1.noarch.rpm">pysrs-0.30.8-1.noarch.rpm</a><br>
+Redhat binary RPM.<br>
+<a href="/linux/pysrs-0.30.8-1.src.rpm">pysrs-0.30.8-1.src.rpm</a><br>
+Redhat source RPM.  
+<li> <a href="pysrs-0.30.7.tar.gz">pysrs-0.30.7.tar.gz</a><br>
+Fix sequencing in pysrs.m4.  Pass fowarding domain to envfrom2srs.py.<br>
 <li> <a href="pysrs-0.30.6.tar.gz">pysrs-0.30.6.tar.gz</a><br>
 Sendmail m4 hack (local feature) thanks to Alain Knaff.<br>
-<a href="/linux/pysrs-0.30.6-4.noarch.rpm">pysrs-0.30.6-4.noarch.rpm</a><br>
-Redhat binary RPM.<br>
-<a href="/linux/pysrs-0.30.6-4.src.rpm">pysrs-0.30.6-4.src.rpm</a><br>
-Redhat source RPM.  Release 3 fixes is_srs regex in pysrs.m4.
-Release 4 moves MakeSrs to end of EnvFromSMTP in pysrs.m4.
 <li> <a href="pysrs-0.30.5.tar.gz">pysrs-0.30.5.tar.gz</a><br>
 Add missing import needed by <code>SRS.new()</code>.
 Make sendmail map scripts use <code>/etc/mail/pysrs.cfg</code>

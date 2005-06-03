@@ -1,6 +1,8 @@
 %define name pysrs
-%define version 0.30.7
+%define version 0.30.9
 %define release 1
+%define sysvinit pysrs.rc
+%define python python2.3
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{name}
@@ -37,23 +39,79 @@ python2.3 setup.py install --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 mkdir -p $RPM_BUILD_ROOT/etc/mail
 cp pysrs.cfg $RPM_BUILD_ROOT/etc/mail
 cat >$RPM_BUILD_ROOT/etc/mail/no-srs-mailers <<'EOF'
-# no-srs-mailers - list domains we should not SRS encode for when we
+# no-srs-mailers - list hosts we should not SRS encode for when we
 # send to them.  E.g. primary MX servers for which we are a secondary.
+# NOTE - these are target hosts (e.g. RHS of mailertable), not target domains.
 #
 EOF
 mkdir -p $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 cp pysrs.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
+cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
+
+# We use same log dir as milter since we also are a sendmail add-on
+mkdir -p $RPM_BUILD_ROOT/var/log/milter
+mkdir -p $RPM_BUILD_ROOT/var/run/milter
+# AIX requires daemons to *not* fork, sysvinit requires that they do!
+%ifos aix4.1
+cat >$RPM_BUILD_ROOT/var/log/milter/pysrs.sh <<'EOF'
+#!/bin/sh
+cd /var/log/milter
+exec /usr/local/bin/python pysrs.py >>pysrs.log 2>&1
+EOF
+%else
+cat >$RPM_BUILD_ROOT/var/log/milter/pysrs.sh <<'EOF'
+#!/bin/sh
+cd /var/log/milter
+exec >>pysrs.log 2>&1
+%{python} pysrs.py &
+echo $! >/var/run/milter/pysrs.pid
+EOF
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+cp %{sysvinit} $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs
+ed $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs <<'EOF'
+/^python=/
+c
+python="%{python}"
+.
+w
+q
+EOF
+%endif
+chmod a+x $RPM_BUILD_ROOT/var/log/milter/pysrs.sh
+cp -p pysrs.py $RPM_BUILD_ROOT/var/log/milter
+
+# logfile rotation
+mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
+cat >$RPM_BUILD_ROOT/etc/logrotate.d/pysrs <<'EOF'
+/var/log/milter/pysrs.log {
+  copytruncate
+  compress
+}
+EOF
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%post
+echo "Syntax of HACK(pysrs) has changed.  Update sendmail.mc."
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %config /etc/mail/pysrs.cfg
 %config /etc/mail/no-srs-mailers
-/usr/share/sendmail-cf/hack/pysrs.m4
+%dir %attr(-,mail,mail)/var/run/milter
+%dir %attr(-,mail,mail)/var/log/milter
+/etc/logrotate.d/pysrs
+/etc/rc.d/init.d/pysrs
+/usr/share/sendmail-cf/hack/*
+/var/log/milter/pysrs.sh
+/var/log/milter/pysrs.py
 
 %changelog
+* Thu Aug 26 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-1
+- Sendmail Socket Daemon
+* Wed Mar 24 2004 Stuart Gathman <stuart@bmsi.com> 0.30.8-1
+- Use HMAC instead of straight sha
 * Wed Mar 24 2004 Stuart Gathman <stuart@bmsi.com> 0.30.7-1
 - Pass SRS_DOMAIN to envfrom2srs.py
 * Wed Mar 24 2004 Stuart Gathman <stuart@bmsi.com> 0.30.6-4

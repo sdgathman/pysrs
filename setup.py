@@ -27,6 +27,7 @@ The Perl reference implementation is at http://www.anarres.org/projects/srs/
         author = 'Stuart Gathman (Perl version by Shevek)', 
         author_email = 'stuart@bmsi.com',
         url = 'http://bmsi.com/python/pysrs.html',
+	py_modules = ['SocketMap'],
         packages = ['SRS'],
 	scripts = ['envfrom2srs.py','srs2envtol.py'],
 	keywords = ['SPF','SRS'],
