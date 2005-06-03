@@ -1,0 +1,11 @@
+include testSRS.py
+include testd.py
+include pysrs.html
+include envfrom2srs.py
+include srs2envtol.py
+include setup.py
+include setup.cfg
+include pysrs.cfg
+include pysrs.m4
+include pysrs.spec
+include CHANGES

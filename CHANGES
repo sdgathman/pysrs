@@ -1,0 +1,10 @@
+0.30.7	Pass SRS_DOMAIN to envfrom2srs.py
+	Put SRS rewriting rule at end of EnvFromSMTP in pysrs.m4.
+	Fix regex for is_srs macro in pysrs.m4.
+0.30.6	set alwaysrewrite=True in envfrom2srs.py since pysrs.m4 skips local
+	domains.
+	Incorporate m4 macro from Alain Knaff for cleaner sendmail support.
+0.30.5	Make sendmail maps use config file in /etc/mail/pysrs.cfg,
+	so there is only only source to modify to change options.
+	Add missing import for SRS.new()
+0.30.4	Move global options to package module.  Rename Base.SRS to Base.Base.
