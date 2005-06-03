@@ -1,4 +1,8 @@
+# Exim compatible socket server for SRS
 # $Log$
+# Revision 1.3  2004/08/26 03:31:38  stuart
+# Introduce sendmail socket map
+#
 # Revision 1.2  2004/03/23 18:46:38  stuart
 # support commandline args for key
 #
@@ -28,7 +32,7 @@ import SocketServer
 
 SRSSOCKET = '/tmp/srsd';
 
-class Handler(SocketServer.StreamRequestHandler):
+class EximHandler(SocketServer.StreamRequestHandler):
 
   def handle(self):
     srs = self.server.srs
@@ -48,8 +52,10 @@ class Handler(SocketServer.StreamRequestHandler):
       res = "ERROR: %s"%x
     self.wfile.write(res+'\n')
 
+
 class Daemon(object):
-  def __init__(self,secret=None,secretfile=None,socket=SRSSOCKET,*args,**kw):
+  def __init__(self,secret=None,secretfile=None,socket=SRSSOCKET,
+    *args,**kw):
     secrets = []
     if secret: secrets += secret
     if secretfile and os.path.exists(secretfile):
@@ -71,8 +77,11 @@ and ensure the secret file is not empty."""
     self.secretfile = secretfile
     self.socket = socket
     self.srs = Guarded(secret=secrets,*args,**kw)
-    os.unlink(socket)
-    self.server = SocketServer.UnixStreamServer(socket,Handler)
+    try:
+      os.unlink(socket)
+    except:
+      pass
+    self.server = SocketServer.UnixStreamServer(socket,EximHandler)
     self.server.srs = self.srs
 
   def run(self):
@@ -82,7 +91,7 @@ def main(args):
   from getopt import getopt
   opts,args = getopt(args,'',['secret=','secretfile='])
   kw = dict([(opt[2:],val) for opt,val in opts])
-  server = Daemon(**kw)
+  server = Daemon(*args,**kw)
   server.run()
 
 if __name__ == '__main__':

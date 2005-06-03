@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.3  2004/06/09 00:29:25  stuart
+# Use hmac instead of straight sha
+#
 # Revision 1.2  2004/03/22 18:20:19  stuart
 # Missing import
 #
@@ -22,6 +25,7 @@
 # it under the same terms as Python itself.
 
 import time
+import hmac
 import sha
 import base64
 import re
@@ -55,7 +59,10 @@ class Base(object):
   	hashlength=SRS.SRSHASHLENGTH,
 	hashmin=None,separator='=',alwaysrewrite=False,ignoretimestamp=False,
 	allowunsafesrs=False):
-    self.secret = secret
+    if type(secret) == str:
+      self.secret = (secret,)
+    else:
+      self.secret = secret
     self.maxage = maxage
     self.hashlength =hashlength
     if hashmin: self.hashmin = hashmin
@@ -68,6 +75,7 @@ class Base(object):
     self.allowunsafesrs = allowunsafesrs
     self.srs0re = re.compile(r'^%s[-+=]' % SRS.SRS0TAG,re.IGNORECASE)
     self.srs1re = re.compile(r'^%s[-+=]' % SRS.SRS1TAG,re.IGNORECASE)
+    #self.ses0re = re.compile(r'^%s[-+=]' % SRS.SES0TAG,re.IGNORECASE)
 
   def warn(self,*msg):
     print >>sys.stderr,'WARNING: ',' '.join(msg)
@@ -197,10 +205,10 @@ and there may be collision problems with sender addresses)."""
 
     secret = self.get_secret()
     assert secret, "Cannot create a cryptographic MAC without a secret"
-    hmac = sha.new(secret[0])
+    h = hmac.new(secret[0],'',sha)
     for i in data:
-      hmac.update(i.lower())
-    hash = base64.encodestring(hmac.digest())
+      h.update(i.lower())
+    hash = base64.encodestring(h.digest())
     return hash[:self.hashlength]
 
   def hash_verify(self,hash,*data):
@@ -216,10 +224,10 @@ with an old secret."""
     assert secret, "Cannot create a cryptographic MAC without a secret"
     hashes = []
     for s in secret:
-      hmac = sha.new(s)
+      h = hmac.new(s,'',sha)
       for i in data:
-	hmac.update(i.lower())
-      valid = base64.encodestring(hmac.digest())[:len(hash)]
+	h.update(i.lower())
+      valid = base64.encodestring(h.digest())[:len(hash)]
       # We test all case sensitive matches before case insensitive
       # matches. While the risk of a case insensitive collision is
       # quite low, we might as well be careful.

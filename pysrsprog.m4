@@ -16,17 +16,20 @@ VERSIONID(`$Id$')
 ifdef(`_MAILER_DEFINED_',,`errprint(`*** WARNING: MAILER() should be before HACK(pysrs)
 ')')
 
-ifdef(`_ARG_',,`errprint(`*** WARNING: HACK(pysrs,sockname) requires sockname
-')')
-ifelse(defn(`_ARG_'),`',,`define(`SRS_SOCKET',_ARG_)')
+ifelse(defn(`_ARG_'),`',,`define(`SRS_DOMAIN',_ARG_)')
 
 LOCAL_CONFIG
 # Forward SRS program map
-Kmake_srs socket SRS_SOCKET
+Kmake_srs program /usr/bin/envfrom2srs.py ifdef(`SRS_DOMAIN',SRS_DOMAIN)
 # Reverse SRS program map
-Kreverse_srs socket SRS_SOCKET
+Kreverse_srs program /usr/bin/srs2envtol.py
+
 # "To" address is SRS
+ifdef(`SRS_DOMAIN',`dnl
+Kis_srs regex CONCAT(`^<?SRS[01][+=-].*@',`SRS_DOMAIN',`\.?>?$')
+',`dnl
 Kis_srs regex ^<?SRS[01][+=-].*
+')dnl
 
 ifdef(`NO_SRS_FILE', `dnl
 # Class of destination mailers not needing SRS
@@ -48,6 +51,11 @@ R$*				$@ NO
 
 
 SMakeSrs
+#
+# Prevent SRS encapsulation if "To" address is SRS
+R$*				$: $1 $>IsSrs $&u
+R$* YES 			$@ $1
+R$* NO				$: $1
 ifdef(`NO_SRS_FROM_LOCAL',`dnl
 #
 # Prevent SRS encapsulation if "From" address is local

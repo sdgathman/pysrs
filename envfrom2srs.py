@@ -1,4 +1,7 @@
 #!/usr/bin/python2.3
+# sendmail program map for SRS
+# Use only if absolutely necessary.  It is *very* inefficient and
+# a security risk.
 
 import SRS
 import re
