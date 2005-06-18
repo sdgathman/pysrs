@@ -1,8 +1,8 @@
 %define name pysrs
-%define version 0.30.9
+%define version 0.30.10
 %define release 1
 %define sysvinit pysrs.rc
-%define python python2.3
+%define python python2.4
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{name}
@@ -17,6 +17,7 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
+Requires: chkconfig
 Url: http://bmsi.com/python/pysrs.html
 
 %description
@@ -27,15 +28,20 @@ they are not authorized to send from.
 See http://spf.pobox.com/srs.html for details.
 The Perl reference implementation is at http://www.anarres.org/projects/srs/
 
+SRS is also useful for detecting forged DSNs (bounces).  SES (Signed
+Envelope Sender) is a variation that is more compact for this purpose,
+and in conjuction with some kind of replay protection can also be
+used as a form of authentication.
+
 %prep
 %setup
 #%patch -p1
 
 %build
-python2.3 setup.py build
+%{python} setup.py build
 
 %install
-python2.3 setup.py install --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+%{python} setup.py install --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 mkdir -p $RPM_BUILD_ROOT/etc/mail
 cp pysrs.cfg $RPM_BUILD_ROOT/etc/mail
 cat >$RPM_BUILD_ROOT/etc/mail/no-srs-mailers <<'EOF'
@@ -93,7 +99,13 @@ EOF
 rm -rf $RPM_BUILD_ROOT
 
 %post
-echo "Syntax of HACK(pysrs) has changed.  Update sendmail.mc."
+#echo "Syntax of HACK(pysrs) has changed.  Update sendmail.mc."
+/sbin/chkconfig --add pysrs
+
+%preun
+if [ $1 = 0 ]; then
+  /sbin/chkconfig --del pysrs
+fi
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
@@ -108,8 +120,10 @@ echo "Syntax of HACK(pysrs) has changed.  Update sendmail.mc."
 /var/log/milter/pysrs.py
 
 %changelog
+* Sun Sep 19 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-2
+- chkconfig --add pysrs
 * Thu Aug 26 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-1
-- Sendmail Socket Daemon
+- Sendmail Socketmap Daemon
 * Wed Mar 24 2004 Stuart Gathman <stuart@bmsi.com> 0.30.8-1
 - Use HMAC instead of straight sha
 * Wed Mar 24 2004 Stuart Gathman <stuart@bmsi.com> 0.30.7-1

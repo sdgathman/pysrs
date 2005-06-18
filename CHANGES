@@ -1,3 +1,5 @@
+0.30.9	Support sendmail socket map.
+0.30.8	Use HMAC instead of straight SHA to match reference implementation.
 0.30.7	Pass SRS_DOMAIN to envfrom2srs.py
 	Put SRS rewriting rule at end of EnvFromSMTP in pysrs.m4.
 	Fix regex for is_srs macro in pysrs.m4.

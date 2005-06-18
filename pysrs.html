@@ -22,7 +22,7 @@ ALT="Viewable With Any Browser" BORDER="0"></A>
 <h4 align=center>
 This web page is written by Stuart D. Gathman<br>and<br>sponsored by
 <a href="http://www.bmsi.com">Business Management Systems, Inc.</a> <br>
-Last updated Jun 08, 2004</h4>
+Last updated Aug 30, 2004</h4>
 
 <p>
 This is a <a href="http://www.python.org/">Python</a> implementation of
@@ -33,7 +33,7 @@ by Shevek.  It includes a test suite, which currently checks four
 levels of forwarding and subsequent reversal for the Guarded, DB, and
 Reversible implementations.
 <ul>
-<li>This package includes scripts to be used as sendmail maps.  See
+<li>This package includes scripts to be used as sendmail program maps.  See
 <a href="http://asarian-host.net/srs/sendmailsrs.htm">sendmail integration</a>
 for an explanation and instructions on incorporating SRS into
 <code>sendmail.cf</code>, substituting <code>envfrom2srs.py</code> and
@@ -41,6 +41,10 @@ for an explanation and instructions on incorporating SRS into
 supplied sendmail m4 hack with <code>sendmail.mc</code>.
 <li>SRS.Daemon.Daemon() provides a simple socket daemon suitable
 for use with the Exim mailer.
+<li>RPM now includes a sendmail socketmap daemon.  The program map is
+no longer recommended.  It is slow and a security risk.  Prior to socketmaps,
+it was all that was available for a custom map.  Socketmap is available
+in <a href="http://www.sendmail.org">sendmail 8.13</a>.
 </ul>
 
 <h3> Sendmail integration </h3>
@@ -59,35 +63,48 @@ dnl # satisfy SPF.  But encoding all outgoing mail can detect bounce forgeries.
 dnl #
 dnl define(`NO_SRS_FROM_LOCAL')dnl
 dnl #
-HACK(`pysrs',`mydomain.com')dnl
+HACK(`pysrs',`/var/run/milter/pysrs')dnl
 </pre>
+
+If you cannot install a version of sendmail with socketmap support, then
+the original program map is still available as <code>HACK(pysrsprog)</code>.
 
 <ul>
 <li>       NO_SRS_FILE is the path of a file containing the recipient
         MTA's for which you won't do SRS (typically, primary MXes for
-        who you are secondary). Just leave this away, if you are
+        which you are secondary). Just leave this away, if you are
         secondary for nobody. The no-srs-mailers file is a simple text
         file which has one recipient MTA per line.
-<li>       The argument to pysrs is the domain that your SRS addresses bear
-	(i.e. if your SRS addresses are srs0=mumble-jumble-toto@mydomain.com,
-	then the argument is mydomain.com).  This overrides fwdomain in
-	/etc/mail/pysrs.cfg.
+<li>       The argument to pysrs is the socket where the socketmap daemon
+	is listening.  This must match <code>/etc/mail/pysrs.cfg</code> or
+	the default of <code>/var/run/milter/pysrs</code>.
 <li>       NO_SRS_FROM_LOCAL : if this is set (define line present), then
         no SRS is done if sender is local (i.e. his domain is in 
         /etc/mail/local-host-names)
+<li>       The argument to pysrsprog is the domain that your SRS addresses bear
+	(i.e. if your SRS addresses are srs0=mumble-jumble-toto@mydomain.com,
+	then the argument is mydomain.com).  This overrides fwdomain in
+	/etc/mail/pysrs.cfg.
 </ul>
 
 <h3>Downloads</h3>
 
 <menu>
 <li> <a href="pysrs-0.30.9.tar.gz">pysrs-0.30.9.tar.gz</a><br>
-Support sendmail socketmap.
+Support sendmail socketmap.<br>
 <a href="/linux/pysrs-0.30.9-1.noarch.rpm">pysrs-0.30.9-1.noarch.rpm</a><br>
-Redhat binary RPM.<br>
+Redhat 7,8,9 binary RPM.<br>
 <a href="/linux/pysrs-0.30.9-1.src.rpm">pysrs-0.30.9-1.src.rpm</a><br>
-Redhat source RPM.  Installs initscript pysrs daemon.
+Redhat source RPM.  Installs initscript pysrs daemon.  <br>
+<a href="/linux/rh73/sendmail-8.13.1-2.73.src.rpm">sendmail-8.13.1-2.73.src.rpm</a><br>
+Redhat 7,8,9 source RPM for sendmail-8.13.  <br>
+<a href="/linux/rh9/sendmail-8.13.1-2.i686.rpm">sendmail-8.13.1-2.i686.rpm</a><br>
+Redhat 9 binary RPM for sendmail-8.13.  
 <li> <a href="pysrs-0.30.8.tar.gz">pysrs-0.30.8.tar.gz</a><br>
-Use HMAC algorithm instead of straight SHA-1 to match reference implementation.<br>
+Use HMAC algorithm instead of straight SHA-1 to match the reference
+implementation.  This will break all currently valid addresses,
+so you might want to accept apparent spoofs for a few days when upgrading.
+<br>
 <a href="/linux/pysrs-0.30.8-1.noarch.rpm">pysrs-0.30.8-1.noarch.rpm</a><br>
 Redhat binary RPM.<br>
 <a href="/linux/pysrs-0.30.8-1.src.rpm">pysrs-0.30.8-1.src.rpm</a><br>

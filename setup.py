@@ -32,7 +32,7 @@ The Perl reference implementation is at http://www.anarres.org/projects/srs/
 	scripts = ['envfrom2srs.py','srs2envtol.py'],
 	keywords = ['SPF','SRS'],
 	classifiers = [
-	  'Development Status :: 4 - Beta',
+	  'Development Status :: 5 - Production/Stable',
 	  'Environment :: No Input/Output (Daemon)',
 	  'Intended Audience :: Developers',
 	  'Intended Audience :: System Administrators',
