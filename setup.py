@@ -18,11 +18,13 @@ setup(
         version = SRS.__version__,
         description = 'Python SRS (Sender Rewriting Scheme) library',
         long_description = """Python SRS (Sender Rewriting Scheme) library.
-As SPF is implemented, mail forwarders must rewrite envfrom for domains
-they are not authorized to send from.
+As SPF is implemented, MTAs that check SPF must account for any forwarders.
+One way to handle forwarding is to have the forwarding MTA rewrite envfrom to a
+domain they are authorized to use.
 
 See http://spf.pobox.com/srs.html for details.
-The Perl reference implementation is at http://www.anarres.org/projects/srs/
+The Perl reference implementation and a C implementation are at
+http://www.libsrs2.org/
 """,
         author = 'Stuart Gathman (Perl version by Shevek)', 
         author_email = 'stuart@bmsi.com',
