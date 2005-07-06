@@ -26,7 +26,7 @@ Kmake_srs socket SRS_SOCKET
 # Reverse SRS program map
 Kreverse_srs socket SRS_SOCKET
 # "To" address is SRS
-Kis_srs regex ^<?SRS[01][+=-].*
+Kis_srs regex ^<?(SRS[01]|SES)[+=-].*
 
 ifdef(`NO_SRS_FILE', `dnl
 # Class of destination mailers not needing SRS

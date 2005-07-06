@@ -1,7 +1,8 @@
-#!/usr/bin/python2.3
+#!/usr/bin/python2.4
 # Sendmail socket server daemon
 
 import SRS
+import SES
 import re
 import os
 from ConfigParser import ConfigParser, DuplicateSectionError
@@ -31,9 +32,11 @@ class SRSHandler(SocketMap.Handler):
     if old_address == '<@>':
       return old_address
     srs = self.server.srs
+    ses = self.server.ses
     fwdomain = self.server.fwdomain
     if not fwdomain:
       fwdomain = self.fwdomain
+    sesdomain = self.server.sesdomain
     use_address = self.bracketRE.sub('',old_address)
     use_address = self.traildotRE.sub('',use_address)
 
@@ -50,7 +53,11 @@ class SRSHandler(SocketMap.Handler):
       return old_address
     except:
       try:
-	new_address = srs.forward(use_address,fwdomain)
+	senduser,sendhost = use_address.split('@')
+	if sendhost.lower() in sesdomain:
+	  new_address = ses.sign(use_address)
+	else:
+	  new_address = srs.forward(use_address,fwdomain)
 	return new_address.replace('@','<@',1)+'.>'
       except:
 	return old_address
@@ -68,7 +75,11 @@ class SRSHandler(SocketMap.Handler):
     # a piped alias).
 
     srs = self.server.srs
+    ses = self.server.ses
     try:
+      a = ses.verify(use_address)
+      if len(a) > 1:
+        return a[0].replace('@','<@',1)+'.>'
       use_address = srs.reverse(use_address)
       while True:
 	try:
@@ -102,13 +113,23 @@ def main(args):
     separator=cp.get('srs','separator'),
     alwaysrewrite=True	# pysrs.m4 can skip calling us for local domains
   )
+  ses = SES.new(
+    secret=cp.get('srs','secret'),
+    expiration=cp.getint('srs','maxage')
+  )
   socket = cp.get('srs','socket')
   try:
     os.remove(socket)
   except: pass
   daemon = SocketMap.Daemon(socket,SRSHandler)
   daemon.server.fwdomain = cp.get('srs','fwdomain',None)
+  if cp.has_option('srs','ses'):
+    daemon.server.sesdomain = [
+    	q.strip() for q in cp.get('srs','ses').split(',')]
+  else:
+    daemon.server.sesdomain = []
   daemon.server.srs = srs
+  daemon.server.ses = ses
   print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
   daemon.run()
   print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
