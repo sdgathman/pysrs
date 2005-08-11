@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.2  2005/06/03 04:13:56  customdesigned
+# Support sendmail socketmap
+#
 # Revision 1.6  2004/08/26 03:31:38  stuart
 # Introduce sendmail socket map
 #
@@ -33,7 +36,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-__version__ = '0.30.9'
+__version__ = '0.30.10'
 
 __all__= [
   'Base',

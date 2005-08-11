@@ -120,6 +120,8 @@ fi
 /var/log/milter/pysrs.py
 
 %changelog
+* Sun Sep 19 2004 Stuart Gathman <stuart@bmsi.com> 0.30.10-1
+- support SES
 * Sun Sep 19 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-2
 - chkconfig --add pysrs
 * Thu Aug 26 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-1

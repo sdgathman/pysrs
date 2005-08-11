@@ -30,9 +30,9 @@ http://www.libsrs2.org/
         author_email = 'stuart@bmsi.com',
         url = 'http://bmsi.com/python/pysrs.html',
 	py_modules = ['SocketMap'],
-        packages = ['SRS'],
+        packages = ['SRS','SES'],
 	scripts = ['envfrom2srs.py','srs2envtol.py'],
-	keywords = ['SPF','SRS'],
+	keywords = ['SPF','SRS','SES'],
 	classifiers = [
 	  'Development Status :: 5 - Production/Stable',
 	  'Environment :: No Input/Output (Daemon)',
