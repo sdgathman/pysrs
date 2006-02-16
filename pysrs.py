@@ -37,6 +37,7 @@ class SRSHandler(SocketMap.Handler):
     if not fwdomain:
       fwdomain = self.fwdomain
     sesdomain = self.server.sesdomain
+    signdomain = self.server.signdomain
     use_address = self.bracketRE.sub('',old_address)
     use_address = self.traildotRE.sub('',use_address)
 
@@ -54,8 +55,11 @@ class SRSHandler(SocketMap.Handler):
     except:
       try:
 	senduser,sendhost = use_address.split('@')
-	if sendhost.lower() in sesdomain:
+	shl = sendhost.lower()
+	if shl in sesdomain:
 	  new_address = ses.sign(use_address)
+	elif shl in signdomain:
+	  new_address = srs.sign(use_address)
 	else:
 	  new_address = srs.forward(use_address,fwdomain)
 	return new_address.replace('@','<@',1)+'.>'
@@ -128,6 +132,12 @@ def main(args):
     	q.strip() for q in cp.get('srs','ses').split(',')]
   else:
     daemon.server.sesdomain = []
+  if cp.has_option('srs','sign'):
+    daemon.server.signdomain = [
+    	q.strip() for q in cp.get('srs','sign').split(',')]
+  else:
+    daemon.server.signdomain = []
+    
   daemon.server.srs = srs
   daemon.server.ses = ses
   print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')

@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.1  2005/06/03 04:13:18  customdesigned
+# Initial import
+#
 # Revision 1.1.1.1  2004/03/19 05:23:13  stuart
 # Import to CVS
 #
@@ -41,7 +44,7 @@ without store, and guards against gaming the shortcut system."""
     self.srs0rek = re.compile(r'^%s(?=[-+=])' % SRS.SRS0TAG,re.IGNORECASE)
     Shortcut.__init__(self,*args,**kw)
 
-  def compile(self,sendhost,senduser):
+  def compile(self,sendhost,senduser,srshost=None):
 
     senduser,m = self.srs1re.subn('',senduser,1)
     if m:
@@ -70,9 +73,9 @@ without store, and guards against gaming the shortcut system."""
       return SRS.SRS1TAG + self.separator + \
 		SRS.SRSSEP.join((hash,sendhost,senduser))
 
-    return Shortcut.compile(self,sendhost,senduser)
+    return Shortcut.compile(self,sendhost,senduser,srshost=srshost)
 
-  def parse(self,user):
+  def parse(self,user,srshost=None):
     user,m = self.srs1re.subn('',user,1)
     if m:
       hash,srshost,srsuser = user.split(SRS.SRSSEP, 2)[-3:]
@@ -87,4 +90,4 @@ without store, and guards against gaming the shortcut system."""
 	assert self.hash_verify(hash,srshost,srsuser), "Invalid hash"
       return srshost, SRS.SRS0TAG + srsuser
 
-    return Shortcut.parse(self,user)
+    return Shortcut.parse(self,user,srshost=srshost)

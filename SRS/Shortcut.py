@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.1  2005/06/03 04:13:18  customdesigned
+# Initial import
+#
 # Revision 1.1.1.1  2004/03/19 05:23:13  stuart
 # Import to CVS
 #
@@ -40,7 +43,7 @@ See Mail::SRS for details of the standard SRS subclass interface.
 This module provides the methods compile() and parse(). It operates
 without store, and shortcuts around all middleman resenders."""
 
-  def compile(self,sendhost,senduser):
+  def compile(self,sendhost,senduser,srshost=None):
 
     senduser,m = self.srs0re.subn('',senduser,1)
     if m:
@@ -66,6 +69,8 @@ without store, and shortcuts around all middleman resenders."""
 
     hash = self.hash_create(timestamp, sendhost, senduser)
 
+    if sendhost == srshost:
+      sendhost = ''
     # Note that there are 5 fields here and that sendhost may
     # not contain a valid separator. Therefore, we do not need to
     # escape separators anywhere in order to reverse this
@@ -73,7 +78,7 @@ without store, and shortcuts around all middleman resenders."""
     return SRS.SRS0TAG + self.separator + \
     	SRS.SRSSEP.join((hash,timestamp,sendhost,senduser))
 
-  def parse(self,user):
+  def parse(self,user,srshost=None):
     user,m = self.srs0re.subn('',user,1)
     # We should deal with SRS1 addresses here, just in case?
     assert m, "Reverse address does not match %s." % self.srs0re.pattern
@@ -81,6 +86,8 @@ without store, and shortcuts around all middleman resenders."""
     # The 4 here matches the number of fields we encoded above. If
     # there are more separators, then they belong in senduser anyway.
     hash,timestamp,sendhost,senduser = user.split(SRS.SRSSEP,3)[-4:]
+    if not sendhost and srshost:
+      sendhost = srshost
     # Again, this must match as above.
     assert self.hash_verify(hash,timestamp,sendhost,senduser), "Invalid hash"
 

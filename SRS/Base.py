@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.2  2005/06/03 04:13:55  customdesigned
+# Support sendmail socketmap
+#
 # Revision 1.3  2004/06/09 00:29:25  stuart
 # Use hmac instead of straight sha
 #
@@ -80,7 +83,25 @@ class Base(object):
   def warn(self,*msg):
     print >>sys.stderr,'WARNING: ',' '.join(msg)
 
-  def forward(self,sender,alias):
+  def sign(self,sender):
+    """srsaddress = srs.sign(sender)
+
+Map a sender address into the same sender and a cryptographic cookie.
+Returns an SRS address to use for preventing bounce abuse.
+
+There are alternative subclasses, some of which will return SRS
+compliant addresses, some will simply return non-SRS but valid RFC821
+addresses. """
+    try:
+      senduser,sendhost = sender.split('@')
+    except ValueError:
+      raise ValueError("Sender '%s' must contain exactly one @" % sender)
+
+    # Subclasses may override the compile() method.
+    srsdata = self.compile(sendhost,senduser,srshost=sendhost)
+    return '%s@%s' % (srsdata,sendhost)
+
+  def forward(self,sender,alias,sign=False):
     """srsaddress = srs.forward(sender, alias)
 
 Map a sender address into a new sender and a cryptographic cookie.
@@ -102,7 +123,10 @@ addresses. """
       return '%s@%s' % (senduser,sendhost)
 
     # Subclasses may override the compile() method.
-    srsdata = self.compile(sendhost,senduser)
+    if sign:
+      srsdata = self.compile(sendhost,senduser,srshost=aliashost)
+    else:
+      srsdata = self.compile(sendhost,senduser)
     return '%s@%s' % (srsdata,aliashost)
 
   def reverse(self,address):
@@ -117,7 +141,7 @@ address. This method will die if the address cannot be reversed."""
     except ValueError:
       raise ValueError("Address '%s' must contain exactly one @" % address)
 
-    sendhost,senduser = self.parse(user)
+    sendhost,senduser = self.parse(user,srshost=host)
     return '%s@%s' % (senduser,sendhost)
 
   def compile(self,sendhost,senduser):

@@ -1,3 +1,4 @@
+0.30.11 Support SRS signing mode.
 0.30.10	Support SES
 0.30.9	Support sendmail socket map.
 0.30.8	Use HMAC instead of straight SHA to match reference implementation.

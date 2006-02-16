@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.2  2005/06/03 04:13:55  customdesigned
+# Support sendmail socketmap
+#
 # Revision 1.4  2004/08/26 03:31:38  stuart
 # Introduce sendmail socket map
 #
@@ -71,6 +74,21 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(srsaddr,addr)
     addr = srs.reverse(srsaddr)
     self.assertEqual(sender,addr)
+
+  def testSign(self):
+    srs = Guarded()
+    srs.set_secret('shhhh!')
+    srs.separator = '+'
+    sender = 'mouse@orig.com'
+    sig = srs.sign(sender)
+    addr = srs.reverse(sig)
+    self.assertEqual(sender,addr)
+    sender = 'mouse@ORIG.com'
+    sig = srs.sign(sender)
+    addr = srs.reverse(sig)
+    self.assertEqual(sender,addr)
+    addr = srs.reverse(sig.lower())
+    self.assertEqual(sender.lower(),addr)
 
   def testCaseSmash(self):
     srs = SRS.new(secret='shhhhh!',separator='+')

@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.1.1.1  2005/06/03 04:13:18  customdesigned
+# Initial import
+#
 # Revision 1.1.1.1  2004/03/19 05:23:13  stuart
 # Import to CVS
 #
@@ -52,7 +55,7 @@ The database is not garbage collected."""
     assert database, "No database specified for SRS.DB"
     self.dbm = bsddb.btopen(database,'c')
 
-  def compile(self,sendhost,senduser):
+  def compile(self,sendhost,senduser,srshost=None):
     ts = time.time()
 
     data = dumps((ts,sendhost,senduser))
@@ -67,7 +70,7 @@ The database is not garbage collected."""
     # + signs anywhere in order to reverse this transformation.
     return SRS.SRS0TAG + self.separator + hash
 
-  def parse(self,user):
+  def parse(self,user,srshost=None):
     user,m = self.srs0re.subn('',user,1)
     assert m, "Reverse address does not match %s." % self.srs0re.pattern
 

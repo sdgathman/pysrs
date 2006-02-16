@@ -1,5 +1,5 @@
 %define name pysrs
-%define version 0.30.10
+%define version 0.30.11
 %define release 1
 %define sysvinit pysrs.rc
 %define python python2.4
@@ -120,7 +120,9 @@ fi
 /var/log/milter/pysrs.py
 
 %changelog
-* Sun Sep 19 2004 Stuart Gathman <stuart@bmsi.com> 0.30.10-1
+* Wed Feb 15 2006 Stuart Gathman <stuart@bmsi.com> 0.30.11-1
+- support SRS signing mode
+* Tue Jul 05 2005 Stuart Gathman <stuart@bmsi.com> 0.30.10-1
 - support SES
 * Sun Sep 19 2004 Stuart Gathman <stuart@bmsi.com> 0.30.9-2
 - chkconfig --add pysrs
