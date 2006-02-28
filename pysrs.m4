@@ -61,7 +61,7 @@ ifdef(`NO_SRS_FILE',`dnl
 # If destination mailer is in non-SRS list, do not apply SRS
 # This is intended for handling communication between secondary MX and
 # primary MX
-R$*				$: $&h $| $1
+R$*				$: $&h. $| $1
 R$={noSrsMailers} $| $*		$@ $2
 R$* $| $*			$: $2
 ')dnl
