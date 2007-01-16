@@ -1,5 +1,5 @@
 %define name pysrs
-%define version 0.30.11
+%define version 0.30.12
 %define release 1
 %define sysvinit pysrs.rc
 %define python python2.4
@@ -45,9 +45,10 @@ used as a form of authentication.
 mkdir -p $RPM_BUILD_ROOT/etc/mail
 cp pysrs.cfg $RPM_BUILD_ROOT/etc/mail
 cat >$RPM_BUILD_ROOT/etc/mail/no-srs-mailers <<'EOF'
-# no-srs-mailers - list hosts we should not SRS encode for when we
+# no-srs-mailers - list hosts (RHS) we should not SRS encode for when we
 # send to them.  E.g. primary MX servers for which we are a secondary.
-# NOTE - these are target hosts (e.g. RHS of mailertable), not target domains.
+# NOTE - mailertable can change the RHS for delivery purposes, you
+# must match the mailertable RHS in that case.
 #
 EOF
 mkdir -p $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
@@ -109,8 +110,8 @@ fi
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
-%config /etc/mail/pysrs.cfg
-%config /etc/mail/no-srs-mailers
+%config(noreplace) /etc/mail/pysrs.cfg
+%config(noreplace) /etc/mail/no-srs-mailers
 %dir %attr(-,mail,mail)/var/run/milter
 %dir %attr(-,mail,mail)/var/log/milter
 /etc/logrotate.d/pysrs
@@ -120,6 +121,8 @@ fi
 /var/log/milter/pysrs.py
 
 %changelog
+* Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
+- Support logging recipient host, and nosrs in pysrs.cfg
 * Wed Feb 15 2006 Stuart Gathman <stuart@bmsi.com> 0.30.11-1
 - support SRS signing mode
 * Tue Jul 05 2005 Stuart Gathman <stuart@bmsi.com> 0.30.10-1

@@ -67,8 +67,6 @@ class SRSHandler(SocketMap.Handler):
 	  new_address = ses.sign(use_address)
 	elif shl in signdomain:
 	  new_address = srs.sign(use_address)
-	elif shl in nosrsdomain:
-	  return old_address
 	else:
 	  new_address = srs.forward(use_address,fwdomain)
 	return new_address.replace('@','<@',1)+'.>'

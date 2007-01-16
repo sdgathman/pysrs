@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.3  2006/02/16 05:21:25  customdesigned
+# Support SRS signing mode.
+#
 # Revision 1.2  2005/08/11 23:35:32  customdesigned
 # SES support.
 #
@@ -39,7 +42,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-__version__ = '0.30.11'
+__version__ = '0.30.12'
 
 __all__= [
   'Base',

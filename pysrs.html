@@ -22,7 +22,7 @@ ALT="Viewable With Any Browser" BORDER="0"></A>
 <h4 align=center>
 This web page is written by Stuart D. Gathman<br>and<br>sponsored by
 <a href="http://www.bmsi.com">Business Management Systems, Inc.</a> <br>
-Last updated Nov 30, 2005</h4>
+Last updated Jul 31, 2006</h4>
 
 <p>
 This is a <a href="http://www.python.org/">Python</a> implementation of
@@ -91,52 +91,6 @@ the original program map is still available as <code>HACK(pysrsprog)</code>.
 
 <h3>Downloads</h3>
 
-<menu>
-<li> <a href="pysrs-0.30.9.tar.gz">pysrs-0.30.9.tar.gz</a><br>
-Support sendmail socketmap.<br>
-<a href="/linux/pysrs-0.30.9-1.noarch.rpm">pysrs-0.30.9-1.noarch.rpm</a><br>
-Redhat 7,8,9 binary RPM.<br>
-<a href="/linux/pysrs-0.30.9-1.src.rpm">pysrs-0.30.9-1.src.rpm</a><br>
-Redhat source RPM.  Installs initscript pysrs daemon.  <br>
-<a href="/linux/rh73/sendmail-8.13.1-2.73.src.rpm">sendmail-8.13.1-2.73.src.rpm</a><br>
-Redhat 7,8,9 source RPM for sendmail-8.13.  <br>
-<a href="/linux/rh9/sendmail-8.13.1-2.i686.rpm">sendmail-8.13.1-2.i686.rpm</a><br>
-Redhat 9 binary RPM for sendmail-8.13.  
-<li> <a href="pysrs-0.30.8.tar.gz">pysrs-0.30.8.tar.gz</a><br>
-Use HMAC algorithm instead of straight SHA-1 to match the reference
-implementation.  This will break all currently valid addresses,
-so you might want to accept apparent spoofs for a few days when upgrading.
-<br>
-<a href="/linux/pysrs-0.30.8-1.noarch.rpm">pysrs-0.30.8-1.noarch.rpm</a><br>
-Redhat binary RPM.<br>
-<a href="/linux/pysrs-0.30.8-1.src.rpm">pysrs-0.30.8-1.src.rpm</a><br>
-Redhat source RPM.  
-<li> <a href="pysrs-0.30.7.tar.gz">pysrs-0.30.7.tar.gz</a><br>
-Fix sequencing in pysrs.m4.  Pass fowarding domain to envfrom2srs.py.<br>
-<li> <a href="pysrs-0.30.6.tar.gz">pysrs-0.30.6.tar.gz</a><br>
-Sendmail m4 hack (local feature) thanks to Alain Knaff.<br>
-<li> <a href="pysrs-0.30.5.tar.gz">pysrs-0.30.5.tar.gz</a><br>
-Add missing import needed by <code>SRS.new()</code>.
-Make sendmail map scripts use <code>/etc/mail/pysrs.cfg</code>
-for configuration.  This allows editing only one file to change config.  This
-also supports additional software needing a matching SRS config such as 
-<a href="milter.html">Python milter</a>.
-<li> <a href="pysrs-0.30.4.tar.gz">pysrs-0.30.4.tar.gz</a><br>
-Move global options to package module.  Rename Base.SRS to Base.Base.
-Do not import classes into package module.  Sorry if this breaks your
-application - this is still beta, and I didn't want to always import all
-implementations when only one will be used in most applications.
-<li> <a href="pysrs-0.30.3.tar.gz">pysrs-0.30.3.tar.gz</a><br>
-Bug fixes from testing envfrom2srs.py and srs2envtol.py in production
-with <a href="milter.html">Python Milter</a>.  Test suite now covers
-sendmail map scripts.
-<li> <a href="pysrs-0.30.2.tar.gz">pysrs-0.30.2.tar.gz</a><br>
-Includes envfrom2srs.py and srs2envtol.py scripts suitable for
-use as a sendmail program map in place of a Perl script.
-<li> <a href="pysrs-0.30.1.tar.gz">pysrs-0.30.1.tar.gz</a><br>
-Includes SRS/Daemon class and test suite suitable for Exim extension.
-Tiny client to call Daemon with command line args.
-<li> <a href="pysrs-0.30.tar.gz">pysrs-0.30.tar.gz</a>
-</menu>
+Goto <a href="http://sourceforge.net/project/showfiles.php?group_id=139894&package_id=153866&release_id=435965">Sourceforge file release</a>.
 
 </body></html>

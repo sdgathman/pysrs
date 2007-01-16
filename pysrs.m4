@@ -21,9 +21,9 @@ ifdef(`_ARG_',,`errprint(`*** WARNING: HACK(pysrs,sockname) requires sockname
 ifelse(defn(`_ARG_'),`',,`define(`SRS_SOCKET',_ARG_)')
 
 LOCAL_CONFIG
-# Forward SRS program map
+# Forward SRS map
 Kmake_srs socket SRS_SOCKET
-# Reverse SRS program map
+# Reverse SRS map
 Kreverse_srs socket SRS_SOCKET
 # "To" address is SRS
 Kis_srs regex ^<?(SRS[01]|SES)[+=-].*
@@ -56,15 +56,15 @@ ifdef(`NO_SRS_FROM_LOCAL',`dnl
 R$* < @ $=w > $*		$@ $1 < @ $2 > $3
 R$* < @ $=w . > $*		$@ $1 < @ $2 . > $3
 ')dnl
+R$*				$: $&h $| $1
 ifdef(`NO_SRS_FILE',`dnl
 #
 # If destination mailer is in non-SRS list, do not apply SRS
 # This is intended for handling communication between secondary MX and
 # primary MX
-R$*				$: $&h. $| $1
 R$={noSrsMailers} $| $*		$@ $2
-R$* $| $*			$: $2
 ')dnl
+#R$* $| $*			$: $2
 R$*				$: $(make_srs $1 $)
 
 SReverseSrs
