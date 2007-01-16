@@ -29,7 +29,14 @@ class SRSHandler(SocketMap.Handler):
   #
   # We need to preprocess it some:
   def _handle_make_srs(self,old_address):
-    if old_address == '<@>':
+    a = old_address.split('\x9b')
+    if len(a) == 2:
+      h,old_address = a
+      self.log('h =',h)
+    else:
+      h = True
+    nosrsdomain = self.server.nosrsdomain
+    if old_address == '<@>' or not h or h in nosrsdomain:
       return old_address
     srs = self.server.srs
     ses = self.server.ses
@@ -60,6 +67,8 @@ class SRSHandler(SocketMap.Handler):
 	  new_address = ses.sign(use_address)
 	elif shl in signdomain:
 	  new_address = srs.sign(use_address)
+	elif shl in nosrsdomain:
+	  return old_address
 	else:
 	  new_address = srs.forward(use_address,fwdomain)
 	return new_address.replace('@','<@',1)+'.>'
@@ -122,24 +131,26 @@ def main(args):
     expiration=cp.getint('srs','maxage')
   )
   socket = cp.get('srs','socket')
-  try:
-    os.remove(socket)
-  except: pass
   daemon = SocketMap.Daemon(socket,SRSHandler)
   daemon.server.fwdomain = cp.get('srs','fwdomain',None)
+  daemon.server.sesdomain = ()
+  daemon.server.signdomain = ()
+  daemon.server.nosrsdomain = ()
   if cp.has_option('srs','ses'):
     daemon.server.sesdomain = [
     	q.strip() for q in cp.get('srs','ses').split(',')]
-  else:
-    daemon.server.sesdomain = []
   if cp.has_option('srs','sign'):
     daemon.server.signdomain = [
     	q.strip() for q in cp.get('srs','sign').split(',')]
-  else:
-    daemon.server.signdomain = []
+  if cp.has_option('srs','nosrs'):
+    daemon.server.nosrsdomain = [
+    	q.strip() for q in cp.get('srs','nosrs').split(',')]
     
   daemon.server.srs = srs
   daemon.server.ses = ses
+  try:
+    os.remove(socket)
+  except: pass
   print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
   daemon.run()
   print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
