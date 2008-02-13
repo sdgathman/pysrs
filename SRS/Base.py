@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.2  2006/02/16 05:16:59  customdesigned
+# Support SRS signing mode.
+#
 # Revision 1.1.1.2  2005/06/03 04:13:55  customdesigned
 # Support sendmail socketmap
 #
@@ -57,6 +60,19 @@ if base & (base - 1):
 PRECISION = 60 * 60 * 24	# One day
 TICKSLOTS = base * base	# Two chars
 
+def parse_addr(sender):
+    quotes = ''
+    try:
+      pos = sender.rindex('@')
+      senduser = sender[:pos]
+      sendhost = sender[pos+1:]
+      if senduser.startswith('"') and senduser.endswith('"'):
+        senduser = senduser[1:-1]
+        quotes = '"'
+    except ValueError:
+      raise ValueError("Sender '%s' must contain exactly one @" % sender)
+    return quotes,senduser,sendhost
+
 class Base(object):
   def __init__(self,secret=None,maxage=SRS.SRSMAXAGE,
   	hashlength=SRS.SRSHASHLENGTH,
@@ -92,14 +108,10 @@ Returns an SRS address to use for preventing bounce abuse.
 There are alternative subclasses, some of which will return SRS
 compliant addresses, some will simply return non-SRS but valid RFC821
 addresses. """
-    try:
-      senduser,sendhost = sender.split('@')
-    except ValueError:
-      raise ValueError("Sender '%s' must contain exactly one @" % sender)
-
+    quotes,senduser,sendhost = parse_addr(sender)
     # Subclasses may override the compile() method.
     srsdata = self.compile(sendhost,senduser,srshost=sendhost)
-    return '%s@%s' % (srsdata,sendhost)
+    return '%s%s%s@%s' % (quotes,srsdata,quotes,sendhost)
 
   def forward(self,sender,alias,sign=False):
     """srsaddress = srs.forward(sender, alias)
@@ -111,23 +123,20 @@ There are alternative subclasses, some of which will return SRS
 compliant addresses, some will simply return non-SRS but valid RFC821
 addresses. """
 
-    try:
-      senduser,sendhost = sender.split('@')
-    except ValueError:
-      raise ValueError("Sender '%s' must contain exactly one @" % sender)
+    quotes,senduser,sendhost = parse_addr(sender)
 
     # We don't require alias to be a full address, just a domain will do
     aliashost = alias.split('@')[-1]
 
     if aliashost.lower() == sendhost.lower() and not self.alwaysrewrite:
-      return '%s@%s' % (senduser,sendhost)
+      return '%s%s%s@%s' % (quotes,senduser,quotes,sendhost)
 
     # Subclasses may override the compile() method.
     if sign:
       srsdata = self.compile(sendhost,senduser,srshost=aliashost)
     else:
       srsdata = self.compile(sendhost,senduser)
-    return '%s@%s' % (srsdata,aliashost)
+    return '%s%s%s@%s' % (quotes,srsdata,quotes,aliashost)
 
   def reverse(self,address):
     """sender = srs->reverse(srsaddress)
@@ -136,13 +145,10 @@ Reverse the mapping to get back the original address. Validates all
 cryptographic and timestamp information. Returns the original sender
 address. This method will die if the address cannot be reversed."""
 
-    try:
-      user,host = address.split('@')
-    except ValueError:
-      raise ValueError("Address '%s' must contain exactly one @" % address)
+    quotes,user,host = parse_addr(address)
 
     sendhost,senduser = self.parse(user,srshost=host)
-    return '%s@%s' % (senduser,sendhost)
+    return '%s%s%s@%s' % (quotes,senduser,quotes,sendhost)
 
   def compile(self,sendhost,senduser):
     """srsdata = srs.compile(host,user)

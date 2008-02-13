@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.2  2006/02/16 05:16:58  customdesigned
+# Support SRS signing mode.
+#
 # Revision 1.1.1.2  2005/06/03 04:13:55  customdesigned
 # Support sendmail socketmap
 #
@@ -56,18 +59,17 @@ class SRSTestCase(unittest.TestCase):
     	'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     srs.separator = '+'
-    sender = 'mouse@orig.com'
+    sender = '"Blah blah"@orig.com'
     srsaddr = srs.forward(sender,sender)
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
-    #print srsaddr
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.failUnless(srsaddr.startswith('"'+SRS.SRS0TAG),srsaddr)
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith(SRS.SRS1TAG))
+    self.failUnless(srsaddr1.startswith('"'+SRS.SRS1TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith(SRS.SRS1TAG))
+    self.failUnless(srsaddr2.startswith('"'+SRS.SRS1TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr,addr)
     addr = srs.reverse(srsaddr1)
