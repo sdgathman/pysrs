@@ -13,3 +13,4 @@ include pysrs.rc7
 include *.m4
 include pysrs.spec
 include CHANGES
+include LICENSE
