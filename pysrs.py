@@ -117,18 +117,21 @@ def main(args):
     cp.add_section('srs')
   except DuplicateSectionError:
     pass
-  srs = SRS.new(
-    secret=cp.get('srs','secret'),
+  secret = [cp.get('srs','secret')]
+  for old in ('secret.0','secret.1', 'secret.2'):
+    if not cp.has_option('srs',old): break
+    secret.append(cp.get('srs',old))
+  srs = SRS.new(secret,
     maxage=cp.getint('srs','maxage'),
     hashlength=cp.getint('srs','hashlength'),
     separator=cp.get('srs','separator'),
     alwaysrewrite=True	# pysrs.m4 can skip calling us for local domains
   )
-  ses = SES.new(
-    secret=cp.get('srs','secret'),
-    expiration=cp.getint('srs','maxage')
-  )
+  ses = SES.new(secret, expiration=cp.getint('srs','maxage'))
   socket = cp.get('srs','socket')
+  try:
+    os.remove(socket)
+  except: pass
   daemon = SocketMap.Daemon(socket,SRSHandler)
   daemon.server.fwdomain = cp.get('srs','fwdomain',None)
   daemon.server.sesdomain = ()
@@ -146,9 +149,6 @@ def main(args):
     
   daemon.server.srs = srs
   daemon.server.ses = ses
-  try:
-    os.remove(socket)
-  except: pass
   print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
   daemon.run()
   print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
