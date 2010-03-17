@@ -4,6 +4,8 @@ divert(-1)
 #	All rights reserved.
 # Copyright (c) 1988, 1993
 #	The Regents of the University of California.  All rights reserved.
+# Portions Copyright (c) 2004-2009
+#	Business Management Systems, Inc  All rights reserved.
 #
 # By using this file, you agree to the terms and conditions set
 # forth in the LICENSE file which can be found at the top level of

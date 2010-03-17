@@ -1,7 +1,13 @@
 #!/usr/bin/python2.3
 # sendmail program map for SRS
+#
 # Use only if absolutely necessary.  It is *very* inefficient and
 # a security risk.
+#
+# Copyright (c) 2004-2010 Business Management Systems. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Python itself.
 
 import SRS
 import re

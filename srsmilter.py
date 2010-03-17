@@ -14,7 +14,7 @@
 
 # Author: Stuart D. Gathman <stuart@bmsi.com>
 # Copyright 2007 Business Management Systems, Inc.
-# This code is under GPL.  See COPYING for details.
+# This code is under GPLv2 or later.  See COPYING for details.
 
 import SRS
 import SES

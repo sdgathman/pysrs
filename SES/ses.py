@@ -2,6 +2,9 @@
 # Class to sign and verify sender addresses with message ID.
 #
 # $Log$
+# Revision 1.1  2005/06/18 21:44:40  customdesigned
+# Changes since 0.30.9.  Begin SES support.
+#
 # Revision 1.8  2004/08/13 17:20:22  stuart
 # Limit validations.
 #
@@ -24,9 +27,10 @@
 # Revision 1.2  2004/08/02 18:50:04  stuart
 # Implement Seth's format as well.
 #
+# Copyright (c) 2004-2010 Business Management Systems. All rights reserved.
 #
-# Copyright 2004 Stuart D. Gathman
-# GPL license
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Python itself.
 #
 import time
 import hmac

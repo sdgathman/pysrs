@@ -2,6 +2,10 @@
 # 
 # $Id$
 #
+# Copyright (c) 2004-2010 Business Management Systems. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Python itself.
 
 import sys,os
 
@@ -22,7 +26,7 @@ As SPF is implemented, MTAs that check SPF must account for any forwarders.
 One way to handle forwarding is to have the forwarding MTA rewrite envfrom to a
 domain they are authorized to use.
 
-See http://spf.pobox.com/srs.html for details.
+See http://www.openspf.org/SRS for details.
 The Perl reference implementation and a C implementation are at
 http://www.libsrs2.org/
 """,

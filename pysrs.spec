@@ -1,5 +1,5 @@
 %define name pysrs
-%define version 0.30.12
+%define version 1.0
 %define release 1
 %define sysvinit pysrs.rc
 %define python python2.4
@@ -25,8 +25,8 @@ Python SRS (Sender Rewriting Scheme) library.
 As SPF is implemented, mail forwarders must rewrite envfrom for domains
 they are not authorized to send from.
 
-See http://spf.pobox.com/srs.html for details.
-The Perl reference implementation is at http://www.anarres.org/projects/srs/
+See http://www.openspf.org/SRS for details.
+The Perl reference implementation is at http://srs-socketmap.info/
 
 SRS is also useful for detecting forged DSNs (bounces).  SES (Signed
 Envelope Sender) is a variation that is more compact for this purpose,
@@ -121,6 +121,8 @@ fi
 /var/log/milter/pysrs.py
 
 %changelog
+* Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1
+- Provide python milter using envfrom rewriting for sendmail and postfix.
 * Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
 - Support logging recipient host, and nosrs in pysrs.cfg
 * Wed Feb 15 2006 Stuart Gathman <stuart@bmsi.com> 0.30.11-1
