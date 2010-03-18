@@ -109,6 +109,7 @@ if [ $1 = 0 ]; then
 fi
 
 %files -f INSTALLED_FILES
+%doc COPYING LICENSE.python LICENSE.sendmail CHANGES
 %defattr(-,root,root)
 %config(noreplace) /etc/mail/pysrs.cfg
 %config(noreplace) /etc/mail/no-srs-mailers
