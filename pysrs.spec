@@ -14,7 +14,7 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
-Requires: chkconfig
+Requires: chkconfig, %{__python}
 Url: http://bmsi.com/python/pysrs.html
 
 %description
@@ -113,6 +113,7 @@ fi
 %changelog
 * Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1
 - Provide python milter using envfrom rewriting for sendmail and postfix.
+- Python 2.6
 
 * Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
 - Support logging recipient host, and nosrs in pysrs.cfg
