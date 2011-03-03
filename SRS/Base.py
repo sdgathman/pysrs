@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.3  2008/02/13 18:20:18  customdesigned
+# Handle quoted localpart.
+#
 # Revision 1.2  2006/02/16 05:16:59  customdesigned
 # Support SRS signing mode.
 #
@@ -32,7 +35,7 @@
 
 import time
 import hmac
-import sha
+from hashlib import sha1 as sha
 import base64
 import re
 import SRS

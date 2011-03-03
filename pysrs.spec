@@ -1,13 +1,10 @@
-%define name pysrs
-%define version 1.0
-%define release 1
 %define sysvinit pysrs.rc
-%define python python2.4
+%define __python python2.6
 
 Summary: Python SRS (Sender Rewriting Scheme) library
-Name: %{name}
-Version: %{version}
-Release: %{release}
+Name: pysrs
+Version: 1.0
+Release: 1.py26
 Source0: %{name}-%{version}.tar.gz
 #Patch0: %{name}-%{version}.patch
 License: Python license
@@ -38,10 +35,10 @@ used as a form of authentication.
 #%patch -p1
 
 %build
-%{python} setup.py build
+%{__python} setup.py build
 
 %install
-%{python} setup.py install --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+%{__python} setup.py install --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 mkdir -p $RPM_BUILD_ROOT/etc/mail
 cp pysrs.cfg $RPM_BUILD_ROOT/etc/mail
 cat >$RPM_BUILD_ROOT/etc/mail/no-srs-mailers <<'EOF'
@@ -58,14 +55,7 @@ cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 # We use same log dir as milter since we also are a sendmail add-on
 mkdir -p $RPM_BUILD_ROOT/var/log/milter
 mkdir -p $RPM_BUILD_ROOT/var/run/milter
-# AIX requires daemons to *not* fork, sysvinit requires that they do!
-%ifos aix4.1
-cat >$RPM_BUILD_ROOT/var/log/milter/pysrs.sh <<'EOF'
-#!/bin/sh
-cd /var/log/milter
-exec /usr/local/bin/python pysrs.py >>pysrs.log 2>&1
-EOF
-%else
+
 cat >$RPM_BUILD_ROOT/var/log/milter/pysrs.sh <<'EOF'
 #!/bin/sh
 cd /var/log/milter
@@ -83,7 +73,6 @@ python="%{python}"
 w
 q
 EOF
-%endif
 chmod a+x $RPM_BUILD_ROOT/var/log/milter/pysrs.sh
 cp -p pysrs.py $RPM_BUILD_ROOT/var/log/milter
 
@@ -124,6 +113,7 @@ fi
 %changelog
 * Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1
 - Provide python milter using envfrom rewriting for sendmail and postfix.
+
 * Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
 - Support logging recipient host, and nosrs in pysrs.cfg
 * Wed Feb 15 2006 Stuart Gathman <stuart@bmsi.com> 0.30.11-1
