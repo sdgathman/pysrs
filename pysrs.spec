@@ -61,7 +61,7 @@ cp %{sysvinit} $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs
 ed $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs <<'EOF'
 /^python=/
 c
-python="%{python}"
+python="%{__python}"
 .
 w
 q
