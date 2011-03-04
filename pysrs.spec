@@ -55,14 +55,7 @@ cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 # We use same log dir as milter since we also are a sendmail add-on
 mkdir -p $RPM_BUILD_ROOT/var/log/milter
 mkdir -p $RPM_BUILD_ROOT/var/run/milter
-
-cat >$RPM_BUILD_ROOT/var/log/milter/pysrs.sh <<'EOF'
-#!/bin/sh
-cd /var/log/milter
-exec >>pysrs.log 2>&1
-%{python} pysrs.py &
-echo $! >/var/run/milter/pysrs.pid
-EOF
+mkdir -p $RPM_BUILD_ROOT/usr/lib/pymilter
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 cp %{sysvinit} $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs
 ed $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs <<'EOF'
@@ -73,8 +66,7 @@ python="%{python}"
 w
 q
 EOF
-chmod a+x $RPM_BUILD_ROOT/var/log/milter/pysrs.sh
-cp -p pysrs.py $RPM_BUILD_ROOT/var/log/milter
+cp -p pysrs.py $RPM_BUILD_ROOT/usr/lib/pymilter
 
 # logfile rotation
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
@@ -102,18 +94,17 @@ fi
 %defattr(-,root,root)
 %config(noreplace) /etc/mail/pysrs.cfg
 %config(noreplace) /etc/mail/no-srs-mailers
-%dir %attr(-,mail,mail)/var/run/milter
-%dir %attr(-,mail,mail)/var/log/milter
 /etc/logrotate.d/pysrs
 /etc/rc.d/init.d/pysrs
 /usr/share/sendmail-cf/hack/*
-/var/log/milter/pysrs.sh
-/var/log/milter/pysrs.py
+/usr/lib/pymilter/pysrs.py
 
 %changelog
 * Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1
-- Provide python milter using envfrom rewriting for sendmail and postfix.
+- Foundation for python milter envfrom rewriting (in progress)
 - Python 2.6
+- Depend on pymilter for start.sh and dirs, even though we don't
+  really need it for anything else until envfrom rewriting is done.
 
 * Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
 - Support logging recipient host, and nosrs in pysrs.cfg

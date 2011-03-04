@@ -23,7 +23,7 @@ pidof() {
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-[ -x /var/log/milter/pysrs.sh ] || exit 0
+test -x /usr/lib/pymilter/pysrs.py&&test -x /usr/lib/pymilter/start.sh||exit 0
 
 RETVAL=0
 prog="pysrs"
@@ -32,7 +32,7 @@ start() {
 	# Start daemons.
 
 	echo -n "Starting $prog: "
-	daemon --check pysrs --user mail /var/log/milter/pysrs.sh
+	daemon --check pysrs --user mail /usr/lib/pymilter/start.sh pysrs
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pysrs
