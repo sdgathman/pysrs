@@ -2,6 +2,9 @@
 # Class to sign and verify sender addresses with message ID.
 #
 # $Log$
+# Revision 1.3  2011/03/03 23:52:21  customdesigned
+# Release 1.0
+#
 # Revision 1.2  2010/03/17 22:05:34  customdesigned
 # License updates.  Python code is Python license, except srsmilter.py.
 # M4 sendmail macros are sendmail license.
@@ -38,7 +41,8 @@
 #
 import time
 import hmac
-from hashlib import sha1 as sha
+try: from hashlib import sha1 as sha
+except: import sha
 import struct
 
 DAY = 24*60*60	# size of day

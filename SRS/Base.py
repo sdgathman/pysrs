@@ -1,4 +1,7 @@
 # $Log$
+# Revision 1.4  2011/03/03 23:46:49  customdesigned
+# Release 1.0
+#
 # Revision 1.3  2008/02/13 18:20:18  customdesigned
 # Handle quoted localpart.
 #
@@ -35,7 +38,8 @@
 
 import time
 import hmac
-from hashlib import sha1 as sha
+try: from hashlib import sha1 as sha
+except: import sha
 import base64
 import re
 import SRS
