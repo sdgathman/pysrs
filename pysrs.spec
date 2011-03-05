@@ -1,11 +1,12 @@
 %define sysvinit pysrs.rc
 %define __python python2.6
+%define pythonbase python26
 
 Summary: Python SRS (Sender Rewriting Scheme) library
-Name: pysrs
+Name: %{pythonbase}-pysrs
 Version: 1.0
-Release: 1.py26
-Source0: %{name}-%{version}.tar.gz
+Release: 1
+Source0: pysrs-%{version}.tar.gz
 #Patch0: %{name}-%{version}.patch
 License: Python license
 Group: Development/Libraries
@@ -14,7 +15,7 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
-Requires: chkconfig, %{__python}
+Requires: chkconfig, %{pythonbase}
 Url: http://bmsi.com/python/pysrs.html
 
 %description
@@ -31,7 +32,7 @@ and in conjuction with some kind of replay protection can also be
 used as a form of authentication.
 
 %prep
-%setup
+%setup -n pysrs-%{version}
 #%patch -p1
 
 %build
