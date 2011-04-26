@@ -155,6 +155,7 @@ def main(args):
   daemon.server.srs = srs
   daemon.server.ses = ses
   print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
+  sys.stdout.flush()
   daemon.run()
   print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
 
