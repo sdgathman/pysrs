@@ -7,7 +7,7 @@ Name: %{pythonbase}-pysrs
 Version: 1.0
 Release: 2
 Source0: pysrs-%{version}.tar.gz
-#Patch0: %{name}-%{version}.patch
+Patch0: %{name}-%{version}.patch
 License: Python license
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -33,7 +33,7 @@ used as a form of authentication.
 
 %prep
 %setup -n pysrs-%{version}
-#%patch -p1
+%patch -p1
 
 %build
 %{__python} setup.py build
