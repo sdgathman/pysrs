@@ -5,7 +5,7 @@
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
 Version: 1.0
-Release: 1
+Release: 2
 Source0: pysrs-%{version}.tar.gz
 #Patch0: %{name}-%{version}.patch
 License: Python license

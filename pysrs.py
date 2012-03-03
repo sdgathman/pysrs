@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python2.6
 # Sendmail socket server daemon
 #
 # Copyright (c) 2004-2010 Business Management Systems. All rights reserved.
