@@ -8,7 +8,7 @@
 # config: /etc/mail/pysrs.cfg
 # pidfile: /var/run/milter/pysrs.pid
 
-python="python2.6"
+python="python"
 
 pidof() {
 	set - ""
@@ -23,16 +23,29 @@ pidof() {
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-test -x /usr/lib/pymilter/pysrs.py&&test -x /usr/lib/pymilter/start.sh||exit 0
+test -x /usr/lib/pymilter/pysrs.py && test -x /usr/sbin/daemonize || exit 0
 
 RETVAL=0
 prog="pysrs"
+datadir="/var/log/milter"
+logdir="/var/log/milter"
+piddir="/var/run/milter"
+libdir="/usr/lib/pymilter"
 
 start() {
-	# Start daemons.
-
+	# Start daemon.
+	if test -s ${datadir}/${prog}.py; then
+	  workdir="${datadir}" # use data dir if it exists for debugging
+	elif test -s ${logdir}/${prog}.py; then
+	  workdir="${logdir}" # use log dir if it exists for debugging
+	else
+	  workdir="${libdir}"
+	fi
 	echo -n "Starting $prog: "
-	daemon --check pysrs --user mail /usr/lib/pymilter/start.sh pysrs
+	daemon --check pysrs --pidfile "${piddir}/${prog}.pid" --user mail \
+	daemonize -a -e "${logdir}/${prog}.log" -o "${logdir}/${prog}.log" \
+		-c "${workdir}" -p "${piddir}/${prog}.pid" \
+		/usr/bin/${python} ${prog}.py 
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/pysrs

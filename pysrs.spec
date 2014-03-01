@@ -1,13 +1,14 @@
 %define sysvinit pysrs.rc
 %define __python python2.6
-%define pythonbase python26
+# set to python26 for EL4,EL5
+%define pythonbase python
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
 Version: 1.0
-Release: 2
+Release: 3
 Source0: pysrs-%{version}.tar.gz
-Patch0: %{name}-%{version}.patch
+Patch0: pysrs-%{version}.patch
 License: Python license
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -15,7 +16,7 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
-Requires: chkconfig, %{pythonbase}
+Requires: chkconfig, %{pythonbase}, daemonize
 Url: http://bmsi.com/python/pysrs.html
 
 %description
@@ -101,10 +102,13 @@ fi
 /usr/lib/pymilter/pysrs.py
 
 %changelog
+* Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-3
+- Use daemonize instead of start.sh, which is gone from pymilter
+
 * Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1
 - Foundation for python milter envfrom rewriting (in progress)
 - Python 2.6
-- Depend on pymilter for start.sh and dirs, even though we don't
+- Depend on pymilter for dirs, even though we don't
   really need it for anything else until envfrom rewriting is done.
 
 * Tue Jan 16 2007 Stuart Gathman <stuart@bmsi.com> 0.30.12-1
