@@ -102,7 +102,7 @@ fi
 /usr/lib/pymilter/pysrs.py
 
 %changelog
-* Fri Feb 28 2014 Stuart Gathman <stuart@bmsi.com> 1.0-3
+* Fri Feb 28 2014 Stuart Gathman <stuart@gathman.org> 1.0-3
 - Use daemonize instead of start.sh, which is gone from pymilter
 
 * Wed May 20 2009 Stuart Gathman <stuart@bmsi.com> 1.0-1

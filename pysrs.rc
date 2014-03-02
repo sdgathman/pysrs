@@ -55,7 +55,7 @@ start() {
 stop() {
 	# Stop daemons.
 	echo -n "Shutting down $prog: "
-	killproc pysrs
+	killproc -p "${piddir}/${prog}.pid" pysrs
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/pysrs
