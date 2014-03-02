@@ -6,7 +6,7 @@
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
 Version: 1.0
-Release: 3
+Release: 4
 Source0: pysrs-%{version}.tar.gz
 Patch: pysrs-%{version}.patch
 License: Python license
@@ -102,6 +102,9 @@ fi
 /usr/lib/pymilter/pysrs.py
 
 %changelog
+* Sat Mar  1 2014 Stuart Gathman <stuart@gathman.org> 1.0-4
+- Fix initscript error
+
 * Fri Feb 28 2014 Stuart Gathman <stuart@gathman.org> 1.0-3
 - Use daemonize instead of start.sh, which is gone from pymilter
 
