@@ -244,7 +244,7 @@ and there may be collision problems with sender addresses)."""
 
     secret = self.get_secret()
     assert secret, "Cannot create a cryptographic MAC without a secret"
-    h = hmac.new(secret[0],'',sha)
+    h = hmac.new(secret[0].encode(),b'',sha)
     for i in data:
       h.update(i.lower())
     hash = base64.encodestring(h.digest())
@@ -263,7 +263,7 @@ with an old secret."""
     assert secret, "Cannot create a cryptographic MAC without a secret"
     hashes = []
     for s in secret:
-      h = hmac.new(s,'',sha)
+      h = hmac.new(s.encode(),b'',sha)
       for i in data:
         h.update(i.lower())
       valid = base64.encodestring(h.digest())[:len(hash)]

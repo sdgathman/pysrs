@@ -138,13 +138,13 @@ class SRSTestCase(unittest.TestCase):
     srsaddr = srs.forward(sender,sender)
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
-    #print srsaddr
+    #print(srsaddr)
     self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     srsaddr1 = srs.forward(srsaddr,'third.com')
-    #print srsaddr1
+    #print(srsaddr1)
     self.assertTrue(srsaddr1.startswith(SRS.SRS0TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
-    #print srsaddr2
+    #print(srsaddr2)
     self.assertTrue(srsaddr2.startswith(SRS.SRS0TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr1,addr)
@@ -160,7 +160,7 @@ class SRSTestCase(unittest.TestCase):
   def sendcmd(self,*args):
     sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     sock.connect(self.sockname)
-    sock.send(' '.join(args)+'\n')
+    sock.send(b' '.join(args)+b'\n')
     res = sock.recv(128).strip()
     sock.close()
     return res
@@ -170,9 +170,9 @@ class SRSTestCase(unittest.TestCase):
     self.daemon = Daemon(socket=sockname,secret=secret)
     server = threading.Thread(target=self.run2,name='srsd')
     server.start()
-    sender = 'mouse@orig.com'
-    srsaddr = self.sendcmd('FORWARD',sender,'second.com')
-    addr = self.sendcmd('REVERSE',srsaddr)
+    sender = b'mouse@orig.com'
+    srsaddr = self.sendcmd(b'FORWARD',sender,b'second.com')
+    addr = self.sendcmd(b'REVERSE',srsaddr)
     server.join()
     self.assertEqual(sender,addr)
 

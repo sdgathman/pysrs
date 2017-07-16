@@ -39,8 +39,8 @@ class EximHandler(socketserver.StreamRequestHandler):
     sock = self.rfile
     try:
       line = self.rfile.readline()
-      #print "Read '%s' on %s\n" % (line.strip(),self.request)
-      args = line.split()
+      # print("Read '%s' on %s\n" % (line.strip(),self.request))
+      args = line.decode().split()
       cmd = args.pop(0).upper()
       if cmd == 'FORWARD':
         res = srs.forward(*args)
@@ -50,7 +50,7 @@ class EximHandler(socketserver.StreamRequestHandler):
         raise ValueError("Invalid command %s" % cmd)
     except Exception as x:
       res = "ERROR: %s"%x
-    self.wfile.write(res+'\n')
+    self.wfile.write((res+'\n').encode())
 
 
 class Daemon(object):

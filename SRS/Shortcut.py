@@ -67,7 +67,7 @@ without store, and shortcuts around all middleman resenders."""
 
     timestamp = self.timestamp_create()
 
-    hash = self.hash_create(timestamp, sendhost, senduser)
+    hash = self.hash_create(timestamp.encode(), sendhost.encode(), senduser.encode())
 
     if sendhost == srshost:
       sendhost = ''
@@ -76,7 +76,7 @@ without store, and shortcuts around all middleman resenders."""
     # escape separators anywhere in order to reverse this
     # transformation.
     return SRS.SRS0TAG + self.separator + \
-            SRS.SRSSEP.join((hash,timestamp,sendhost,senduser))
+            SRS.SRSSEP.join((hash.decode(),timestamp,sendhost,senduser))
 
   def parse(self,user,srshost=None):
     user,m = self.srs0re.subn('',user,1)
@@ -89,7 +89,7 @@ without store, and shortcuts around all middleman resenders."""
     if not sendhost and srshost:
       sendhost = srshost
     # Again, this must match as above.
-    assert self.hash_verify(hash,timestamp,sendhost,senduser), "Invalid hash"
+    assert self.hash_verify(hash.encode(),timestamp.encode(),sendhost.encode(),senduser.encode()), "Invalid hash"
 
     assert self.timestamp_check(timestamp), "Invalid timestamp"
     return sendhost,senduser

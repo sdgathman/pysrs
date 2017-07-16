@@ -36,11 +36,11 @@ without store."""
     timestamp = self.timestamp_create()
     # This has to be done in compile, because we might need access
     # to it for storing in a database.
-    hash = self.hash_create(timestamp,sendhost,senduser)
+    hash = self.hash_create(timestamp.encode(),sendhost.encode(),senduser.encode())
     if sendhost == srshost:
       sendhost = ''
     # Note that there are 4 fields here and that sendhost may
     # not contain a + sign. Therefore, we do not need to escape
     # + signs anywhere in order to reverse this transformation.
     return SRS.SRS0TAG + self.separator + \
-        SRS.SRSSEP.join((hash,timestamp,sendhost,senduser))
+        SRS.SRSSEP.join((hash.decode(),timestamp,sendhost,senduser))

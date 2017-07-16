@@ -10,7 +10,7 @@ import sys
 
 sock = socket(AF_UNIX,SOCK_STREAM)
 sock.connect('/tmp/srsd')
-sock.send(' '.join(sys.argv[1:])+'\n')
+sock.send(b' '.join(sys.argv[1:])+b'\n')
 res = sock.recv(128).strip()
 print(res)
 sock.close()
