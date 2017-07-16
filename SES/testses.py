@@ -24,10 +24,10 @@ class SESTestCase(unittest.TestCase):
       self.assertEqual(tc,self.ses.get_timecode(secs))
 
   def testHash(self):
-    data = ('now','is','the','time')
+    data = (b'now', b'is', b'the', b'time')
     h = self.ses.hash_create(*data)
     self.assertTrue(self.ses.hash_verify(h,*data))
-    self.assertTrue(not self.ses.hash_verify(h,'some','other','data'))
+    self.assertTrue(not self.ses.hash_verify(h, b'some', b'other', b'data'))
 
   def testMessageID(self):
     while True:
@@ -44,7 +44,7 @@ class SESTestCase(unittest.TestCase):
 
   def testSigpack(self):
     tc = 50000
-    h = self.ses.hash_create('some','data')
+    h = self.ses.hash_create(b'some',b'data')
     for msgid in (1,100000,12345657423784):
       sig = self.ses.sig_create(msgid,tc,h)
       ts = tc + 30

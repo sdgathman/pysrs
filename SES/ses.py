@@ -39,6 +39,8 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 #
+from __future__ import print_function
+
 import time
 import hmac
 try: from hashlib import sha1 as sha
@@ -55,7 +57,10 @@ def longbits(hash,n):
   hashbits = 0
   h = 0
   for b in hash:
-    h = (h << 8) + ord(b)
+    if type(b) == int:
+        h = (h << 8) + b
+    elif type(b) == str:
+        h = (h << 8) + ord(b)
     hashbits += 8
     if hashbits >= n:
       return h >> (hashbits - n)
@@ -185,7 +190,7 @@ and there may be collision problems with sender addresses)."""
 
     secret = self.get_secret()
     assert secret, "Cannot create a cryptographic MAC without a secret"
-    h = hmac.new(secret[0],'',sha)
+    h = hmac.new(secret[0].encode(),b'',sha)
     for i in data:
       h.update(i)
     return longbits(h.digest(),self.hashbits)
@@ -202,7 +207,7 @@ with an old secret."""
     assert secret, "Cannot verify a cryptographic MAC without a secret"
     hashes = []
     for s in secret:
-      h = hmac.new(s,'',sha)
+      h = hmac.new(s.encode(), b'',sha)
       for i in data:
         h.update(i)
       if hash == longbits(h.digest(),self.hashbits):
@@ -242,7 +247,7 @@ with an old secret."""
       ts = 0
     else:
       ts,msgid = self.create_message_id()
-    h = self.hash_create(struct.pack('>QQ',ts,msgid),local,'@',domain.lower())
+    h = self.hash_create(struct.pack('>QQ',ts,msgid),local.encode(),b'@',domain.lower().encode())
     t = self.sig_create(msgid,ts,h)
     return 'SES=%s=%s@%s' % (t,local,domain)
 
@@ -258,7 +263,7 @@ with an old secret."""
       ts = self.get_timecode()
       msgid,tc,h = self.sig_extract(sig,ts)
       if not tc or ts - tc < self.expiration and self.hash_verify(h,
-              struct.pack('>QQ',tc,msgid),user,'@',domain.lower()):
+              struct.pack('>QQ',tc,msgid),user.encode(),b'@',domain.lower().encode()):
         if tc:	# count validations
           self.valtrack[msgid] = cnt = self.valtrack.get(msgid,0) + 1
           if cnt > self.maxval:

@@ -36,6 +36,8 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
+from __future__ import print_function
+
 import time
 import hmac
 try: from hashlib import sha1 as sha
