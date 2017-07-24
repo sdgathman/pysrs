@@ -82,9 +82,9 @@ def parse_addr(sender):
 
 class Base(object):
   def __init__(self,secret=None,maxage=SRS.SRSMAXAGE,
-  	hashlength=SRS.SRSHASHLENGTH,
-	hashmin=None,separator='=',alwaysrewrite=False,ignoretimestamp=False,
-	allowunsafesrs=False):
+        hashlength=SRS.SRSHASHLENGTH,
+        hashmin=None,separator='=',alwaysrewrite=False,ignoretimestamp=False,
+        allowunsafesrs=False):
     if type(secret) == str:
       self.secret = (secret,)
     else:
@@ -263,7 +263,7 @@ with an old secret."""
     for s in secret:
       h = hmac.new(s,'',sha)
       for i in data:
-	h.update(i.lower())
+        h.update(i.lower())
       valid = base64.encodestring(h.digest())[:len(hash)]
       # We test all case sensitive matches before case insensitive
       # matches. While the risk of a case insensitive collision is
@@ -273,9 +273,9 @@ with an old secret."""
     hash = hash.lower()
     for h in hashes:
       if hash == h.lower():
-	self.warn("""SRS: Case insensitive hash match detected.
+        self.warn("""SRS: Case insensitive hash match detected.
 Someone smashed case in the local-part.""")
-	return True
+        return True
     return False;
 
   def set_secret(self,*args):

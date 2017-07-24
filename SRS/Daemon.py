@@ -43,11 +43,11 @@ class EximHandler(socketserver.StreamRequestHandler):
       args = line.split()
       cmd = args.pop(0).upper()
       if cmd == 'FORWARD':
-	res = srs.forward(*args)
+        res = srs.forward(*args)
       elif cmd == 'REVERSE':
-	res = srs.reverse(*args)
+        res = srs.reverse(*args)
       else:
-	raise ValueError("Invalid command %s" % cmd)
+        raise ValueError("Invalid command %s" % cmd)
     except Exception as x:
       res = "ERROR: %s"%x
     self.wfile.write(res+'\n')
@@ -60,12 +60,12 @@ class Daemon(object):
     if secret: secrets += secret
     if secretfile and os.path.exists(secretfile):
       assert os.path.isfile(secretfile) and os.access(secretfile,os.R_OK), \
-	"Secret file $secretfile not readable"
+        "Secret file $secretfile not readable"
       FH = open(secretfile)
       for ln in FH:
         if not ln: continue
-	if ln.startswith('#'): continue
-	secrets += ln
+        if ln.startswith('#'): continue
+        secrets += ln
       FH.close()
 
     assert secrets, \

@@ -66,17 +66,17 @@ class SRSHandler(SocketMap.Handler):
       return old_address
     except:
       try:
-	senduser,sendhost = use_address.split('@')
-	shl = sendhost.lower()
-	if shl in sesdomain:
-	  new_address = ses.sign(use_address)
-	elif shl in signdomain:
-	  new_address = srs.sign(use_address)
-	else:
-	  new_address = srs.forward(use_address,fwdomain)
-	return new_address.replace('@','<@',1)+'.>'
+        senduser,sendhost = use_address.split('@')
+        shl = sendhost.lower()
+        if shl in sesdomain:
+          new_address = ses.sign(use_address)
+        elif shl in signdomain:
+          new_address = srs.sign(use_address)
+        else:
+          new_address = srs.forward(use_address,fwdomain)
+        return new_address.replace('@','<@',1)+'.>'
       except:
-	return old_address
+        return old_address
 
   def _handle_reverse_srs(self,old_address):
 
@@ -98,15 +98,15 @@ class SRSHandler(SocketMap.Handler):
         return a[0].replace('@','<@',1)+'.>'
       use_address = srs.reverse(use_address)
       while True:
-	try:
-	  use_address = srs.reverse(use_address)
-	except: break
+        try:
+          use_address = srs.reverse(use_address)
+        except: break
       return use_address.replace('@','<@',1)+'.>'
     except:
       if use_address.startswith('|'):
-	return '"%s"' % old_address
+        return '"%s"' % old_address
       else:
-	return old_address
+        return old_address
 
 def main(args):
 # get SRS parameters from milter configuration
@@ -144,13 +144,13 @@ def main(args):
   daemon.server.nosrsdomain = ()
   if cp.has_option('srs','ses'):
     daemon.server.sesdomain = [
-    	q.strip() for q in cp.get('srs','ses').split(',')]
+            q.strip() for q in cp.get('srs','ses').split(',')]
   if cp.has_option('srs','sign'):
     daemon.server.signdomain = [
-    	q.strip() for q in cp.get('srs','sign').split(',')]
+            q.strip() for q in cp.get('srs','sign').split(',')]
   if cp.has_option('srs','nosrs'):
     daemon.server.nosrsdomain = [
-    	q.strip() for q in cp.get('srs','nosrs').split(',')]
+            q.strip() for q in cp.get('srs','nosrs').split(',')]
     
   daemon.server.srs = srs
   daemon.server.ses = ses

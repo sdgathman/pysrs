@@ -30,7 +30,7 @@ class Handler(socketserver.StreamRequestHandler):
       if not ch in "0123456789":
         raise ValueError
       if len(n) >= maxlen:
-	raise OverflowError
+        raise OverflowError
       n += ch
       ch = file.read(1)
     return int(n)
@@ -53,28 +53,28 @@ class Handler(socketserver.StreamRequestHandler):
     #self.log("connect")
     while True:
       try:
-	line = self.read()
-	self.log(line)
-	args = line.split(' ',1)
-	map = args.pop(0).replace('-','_')
-	meth = getattr(self, '_handle_' + map, None)
-	if not map:
-	  raise ValueError("Unrecognized map: %s" % map)
-	res = meth(*args)
-	self.write('OK ' + res)
+        line = self.read()
+        self.log(line)
+        args = line.split(' ',1)
+        map = args.pop(0).replace('-','_')
+        meth = getattr(self, '_handle_' + map, None)
+        if not map:
+          raise ValueError("Unrecognized map: %s" % map)
+        res = meth(*args)
+        self.write('OK ' + res)
       except EOFError:
         #self.log("Ending connection")
-	return
+        return
       except MapError as x:
-	if code in ('PERM','TIMEOUT','NOTFOUND','OK','TEMP'):
-	  self.write("%s %s"%(x.code,x.reason))
-	else:
-	  self.write("%s %s %s"%('PERM',x.code,x.reason))
+        if code in ('PERM','TIMEOUT','NOTFOUND','OK','TEMP'):
+          self.write("%s %s"%(x.code,x.reason))
+        else:
+          self.write("%s %s %s"%('PERM',x.code,x.reason))
       except LookupError as x:
         self.write("NOTFOUND")
       except Exception as x:
-	#print x
-	self.write("TEMP %s"%x)
+        #print x
+        self.write("TEMP %s"%x)
       # PERM,TIMEOUT
 
 # Application should subclass SocketMap.Daemon, and define

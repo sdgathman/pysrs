@@ -56,7 +56,7 @@ class SRSTestCase(unittest.TestCase):
   def testGuarded(self):
     srs = Guarded()
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     srs.separator = '+'
     sender = '"Blah blah"@orig.com'
@@ -107,7 +107,7 @@ class SRSTestCase(unittest.TestCase):
   def testReversible(self):
     srs = Reversible()
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     srs.separator = '+'
     sender = 'mouse@orig.com'
@@ -132,7 +132,7 @@ class SRSTestCase(unittest.TestCase):
   def testDB(self,database='/tmp/srstest'):
     srs = DB(database=database)
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     sender = 'mouse@orig.com'
     srsaddr = srs.forward(sender,sender)

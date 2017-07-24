@@ -32,8 +32,8 @@ class DB(Base):
 
 SYNOPSIS
 
-	from SRS.DB import DB
-	srs = DB(Database='/var/run/srs.db', ...)
+        from SRS.DB import DB
+        srs = DB(Database='/var/run/srs.db', ...)
 
 DESCRIPTION
 

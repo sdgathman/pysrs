@@ -93,7 +93,7 @@ def bitunpack(flds,bits):
 class SES(object):
 
   def __init__(self,secret,hashbits=80,expiration=10,fbits=2,chars=BASE,
-  	nservers=1,server=0,maxval=3):
+          nservers=1,server=0,maxval=3):
     if type(secret) == str:
       self.secret = (secret,)
     else:
@@ -204,16 +204,16 @@ with an old secret."""
     for s in secret:
       h = hmac.new(s,'',sha)
       for i in data:
-	h.update(i)
+        h.update(i)
       if hash == longbits(h.digest(),self.hashbits):
         return True
     return False;
 
   def sig_create(self,msgid,ts,h):
     """Return encoded signature.
-    	msgid - long integer id unique for timecode
-    	ts    - 32 bit timecode: day fractions since epoch
-	h     - long with high order self.hashbits bits of hash digest"""
+       msgid - long integer id unique for timecode
+       ts    - 32 bit timecode: day fractions since epoch
+       h     - long with high order self.hashbits bits of hash digest"""
     if ts:
       return self.encode(bitpack(self.flds,msgid,ts % self.tcmask,h))
     else:
@@ -221,22 +221,22 @@ with an old secret."""
 
   def sig_extract(self,sig,ts):
     """Return msgid,timecode,hash extracted from sig.
-	sig - encoded sig returned by sig_create
-	ts  - the current timecode
+       sig - encoded sig returned by sig_create
+       ts  - the current timecode
     """
     msgid,tc,hash = bitunpack(self.flds,self.decode(sig))
     tcmask = self.tcmask
     if tc != tcmask:
       tc = ts // tcmask * tcmask + int(tc)
       if tc > ts:
-	tc -= tcmask
+        tc -= tcmask
     else:
       tc = 0
     return msgid,tc,hash
    
   def sign(self,address,msgid=None):
     """Return signed address.
-	if msgid is supplied, a fixed signature is generated."""
+       if msgid is supplied, a fixed signature is generated."""
     local,domain = address.split('@',1)
     if msgid:	# fixed sig
       ts = 0
@@ -251,19 +251,19 @@ with an old secret."""
     unchanged if signature is invalid."""
     if address.upper().startswith('SES='):
       try:
-	local,domain = address.split('@',1)
-	tag,sig,user = local.split('=')
+        local,domain = address.split('@',1)
+        tag,sig,user = local.split('=')
       except ValueError:
-	raise ValueError("Invalid SES signature format: %s" % local)
+        raise ValueError("Invalid SES signature format: %s" % local)
       ts = self.get_timecode()
       msgid,tc,h = self.sig_extract(sig,ts)
       if not tc or ts - tc < self.expiration and self.hash_verify(h,
-      	struct.pack('>QQ',tc,msgid),user,'@',domain.lower()):
-	if tc:	# count validations
-	  self.valtrack[msgid] = cnt = self.valtrack.get(msgid,0) + 1
-	  if cnt > self.maxval:
-	    raise RuntimeError(
-	      "Too many validations of signature: %s" % address)
+              struct.pack('>QQ',tc,msgid),user,'@',domain.lower()):
+        if tc:	# count validations
+          self.valtrack[msgid] = cnt = self.valtrack.get(msgid,0) + 1
+          if cnt > self.maxval:
+            raise RuntimeError(
+              "Too many validations of signature: %s" % address)
         return user + '@' + domain,tc,msgid
     return address,
 

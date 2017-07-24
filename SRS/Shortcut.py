@@ -30,8 +30,8 @@ class Shortcut(Base):
 
 SYNOPSIS
 
-	import SRS.Shortcut
-	srs = SRS.Shortcut(...)
+        import SRS.Shortcut
+        srs = SRS.Shortcut(...)
 
 DESCRIPTION
 
@@ -60,10 +60,10 @@ without store, and shortcuts around all middleman resenders."""
     else:
       senduser,m = self.srs1re.subn('',senduser,1)
       if m:
-	# This should never be hit in practice. It would be bad.
-	# Introduce compatibility with the guarded format?
-	# SRSHOST, hash, timestamp, host, user
-	sendhost,senduser = senduser.split(SRS.SRSSEP,5)[-2:]
+        # This should never be hit in practice. It would be bad.
+        # Introduce compatibility with the guarded format?
+        # SRSHOST, hash, timestamp, host, user
+        sendhost,senduser = senduser.split(SRS.SRSSEP,5)[-2:]
 
     timestamp = self.timestamp_create()
 
@@ -76,7 +76,7 @@ without store, and shortcuts around all middleman resenders."""
     # escape separators anywhere in order to reverse this
     # transformation.
     return SRS.SRS0TAG + self.separator + \
-    	SRS.SRSSEP.join((hash,timestamp,sendhost,senduser))
+            SRS.SRSSEP.join((hash,timestamp,sendhost,senduser))
 
   def parse(self,user,srshost=None):
     user,m = self.srs0re.subn('',user,1)

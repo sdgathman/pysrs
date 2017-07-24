@@ -65,13 +65,13 @@ without store, and guards against gaming the shortcut system."""
 
       hash = self.hash_create(srshost,srsuser)
       return SRS.SRS1TAG + self.separator + \
-		SRS.SRSSEP.join((hash,srshost,srsuser))
+                SRS.SRSSEP.join((hash,srshost,srsuser))
 
     senduser,m = self.srs0rek.subn('',senduser,1)
     if m:
       hash = self.hash_create(sendhost, senduser)
       return SRS.SRS1TAG + self.separator + \
-		SRS.SRSSEP.join((hash,sendhost,senduser))
+                SRS.SRSSEP.join((hash,sendhost,senduser))
 
     return Shortcut.compile(self,sendhost,senduser,srshost=srshost)
 
@@ -81,13 +81,13 @@ without store, and guards against gaming the shortcut system."""
       hash,srshost,srsuser = user.split(SRS.SRSSEP, 2)[-3:]
       if hash.find('.') >= 0:
         assert self.allowunsafesrs, \
-	  "Hashless SRS1 address received when AllowUnsafeSrs is not set"
-	# Reconstruct the parameters as they were in the old format.
-	srsuser = srshost + SRS.SRSSEP + srsuser
-	srshost = hash
+          "Hashless SRS1 address received when AllowUnsafeSrs is not set"
+        # Reconstruct the parameters as they were in the old format.
+        srsuser = srshost + SRS.SRSSEP + srsuser
+        srshost = hash
       else:
-	assert srshost and srsuser, "Invalid SRS1 address"
-	assert self.hash_verify(hash,srshost,srsuser), "Invalid hash"
+        assert srshost and srsuser, "Invalid SRS1 address"
+        assert self.hash_verify(hash,srshost,srsuser), "Invalid hash"
       return srshost, SRS.SRS0TAG + srsuser
 
     return Shortcut.parse(self,user,srshost=srshost)

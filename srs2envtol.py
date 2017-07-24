@@ -50,7 +50,7 @@ def reverse(old_address):
     use_address = srs.reverse(use_address)
     while True:
       try:
-	use_address = srs.reverse(use_address)
+        use_address = srs.reverse(use_address)
       except: break
     return use_address.replace('@','<@',1)+'.>'
   except:

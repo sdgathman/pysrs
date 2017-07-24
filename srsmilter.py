@@ -110,17 +110,17 @@ class srsMilter(Milter.Base):
       return old_address
     except:
       try:
-	senduser,sendhost = use_address.split('@')
-	shl = sendhost.lower()
-	if shl in sesdomain:
-	  new_address = ses.sign(use_address)
-	elif shl in signdomain:
-	  new_address = srs.sign(use_address)
-	else:
-	  new_address = srs.forward(use_address,fwdomain)
-	return '<%s>'%new_address
+        senduser,sendhost = use_address.split('@')
+        shl = sendhost.lower()
+        if shl in sesdomain:
+          new_address = ses.sign(use_address)
+        elif shl in signdomain:
+          new_address = srs.sign(use_address)
+        else:
+          new_address = srs.forward(use_address,fwdomain)
+        return '<%s>'%new_address
       except:
-	return old_address
+        return old_address
 
   @Milter.noreply
   def connect(self,hostname,unused,hostaddr):
@@ -131,7 +131,7 @@ class srsMilter(Milter.Base):
     if hostaddr and len(hostaddr) > 0:
       ipaddr = hostaddr[0]
       if iniplist(ipaddr,self.conf.internal_connect):
-	self.internal_connection = True
+        self.internal_connection = True
       if iniplist(ipaddr,self.conf.trusted_relay):
         self.trusted_relay = True
     else: ipaddr = ''
@@ -219,9 +219,9 @@ class srsMilter(Milter.Base):
   def eom(self):
     for name,val,idx in self.new_headers:
       try:
-	self.addheader(name,val,idx)
+        self.addheader(name,val,idx)
       except:
-	self.addheader(name,val)	# older sendmail can't insheader
+        self.addheader(name,val)	# older sendmail can't insheader
     return Milter.CONTINUE
 
 if __name__ == "__main__":
