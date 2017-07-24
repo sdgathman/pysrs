@@ -21,7 +21,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-import bsddb
+import bsddb3
 import time
 import SRS
 from .Base import Base
@@ -53,7 +53,7 @@ The database is not garbage collected."""
   def __init__(self,database='/var/run/srs.db',hashlength=24,*args,**kw):
     Base.__init__(self,hashlength=hashlength,*args,**kw)
     assert database, "No database specified for SRS.DB"
-    self.dbm = bsddb.btopen(database,'c')
+    self.dbm = bsddb3.btopen(database,'c')
 
   def compile(self,sendhost,senduser,srshost=None):
     ts = time.time()
