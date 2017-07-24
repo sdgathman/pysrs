@@ -23,7 +23,7 @@
 
 import re
 import SRS
-from Shortcut import Shortcut
+from .Shortcut import Shortcut
 
 class Guarded(Shortcut):
   """This is the default subclass of SRS. An instance of this subclass

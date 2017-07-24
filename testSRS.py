@@ -63,13 +63,13 @@ class SRSTestCase(unittest.TestCase):
     srsaddr = srs.forward(sender,sender)
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
-    self.failUnless(srsaddr.startswith('"'+SRS.SRS0TAG),srsaddr)
+    self.assertTrue(srsaddr.startswith('"'+SRS.SRS0TAG),srsaddr)
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith('"'+SRS.SRS1TAG))
+    self.assertTrue(srsaddr1.startswith('"'+SRS.SRS1TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith('"'+SRS.SRS1TAG))
+    self.assertTrue(srsaddr2.startswith('"'+SRS.SRS1TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr,addr)
     addr = srs.reverse(srsaddr1)
@@ -97,11 +97,11 @@ class SRSTestCase(unittest.TestCase):
     # FIXME: whether case smashing occurs depends on what day it is.
     sender = 'mouse@fickle1.com'
     srsaddr = srs.forward(sender,'second.com')
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     self.case_smashed = False
     srs.warn = self.warn
     addr = srs.reverse(srsaddr.lower())
-    self.failUnless(self.case_smashed)	# check that warn was called
+    self.assertTrue(self.case_smashed)	# check that warn was called
     self.assertEqual(sender,addr)
 
   def testReversible(self):
@@ -115,13 +115,13 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
     #print srsaddr
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr1.startswith(SRS.SRS0TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr2.startswith(SRS.SRS0TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr1,addr)
     addr = srs.reverse(srsaddr1)
@@ -139,13 +139,13 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
     #print srsaddr
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr1.startswith(SRS.SRS0TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr2.startswith(SRS.SRS0TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr1,addr)
     addr = srs.reverse(srsaddr1)
@@ -181,7 +181,7 @@ class SRSTestCase(unittest.TestCase):
     import srs2envtol
     orig = 'mickey<@orig.com.>'
     newaddr = envfrom2srs.forward(orig)
-    self.failUnless(newaddr.endswith('.>'))
+    self.assertTrue(newaddr.endswith('.>'))
     addr2 = srs2envtol.reverse(newaddr)
     self.assertEqual(addr2,orig)
     # check case smashing by braindead mailers
@@ -189,7 +189,7 @@ class SRSTestCase(unittest.TestCase):
     srs2envtol.srs.warn = self.warn
     addr2 = srs2envtol.reverse(newaddr.lower())
     self.assertEqual(addr2,orig)
-    self.failUnless(self.case_smashed)
+    self.assertTrue(self.case_smashed)
 
 def suite(): return unittest.makeSuite(SRSTestCase,'test')
 

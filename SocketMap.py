@@ -5,14 +5,14 @@
 #
 # Base class for sendmail socket servers
 
-import SocketServer
+import socketserver
 
 class MapError(Exception):
   def __init__(self,code,reason):
     self.code = code
     self.reason = reason
 
-class Handler(SocketServer.StreamRequestHandler):
+class Handler(socketserver.StreamRequestHandler):
 
   def write(self,s):
     "write netstring to socket"
@@ -65,14 +65,14 @@ class Handler(SocketServer.StreamRequestHandler):
       except EOFError:
         #self.log("Ending connection")
 	return
-      except MapError,x:
+      except MapError as x:
 	if code in ('PERM','TIMEOUT','NOTFOUND','OK','TEMP'):
 	  self.write("%s %s"%(x.code,x.reason))
 	else:
 	  self.write("%s %s %s"%('PERM',x.code,x.reason))
-      except LookupError,x:
+      except LookupError as x:
         self.write("NOTFOUND")
-      except Exception,x:
+      except Exception as x:
 	#print x
 	self.write("TEMP %s"%x)
       # PERM,TIMEOUT
@@ -93,7 +93,7 @@ class Daemon(object):
     try:
       os.unlink(socket)
     except: pass
-    self.server = SocketServer.ThreadingUnixStreamServer(socket,handlerfactory)
+    self.server = socketserver.ThreadingUnixStreamServer(socket,handlerfactory)
     self.server.daemon = self
 
   def run(self):

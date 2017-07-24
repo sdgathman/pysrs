@@ -72,7 +72,7 @@ SRSMAXAGE = 21
 #from Reversible import Reversible
 #from Daemon import Daemon
 #from DB import DB
-import Guarded
+from . import Guarded
 
 def new(secret=None,*args,**kw):
   return Guarded.Guarded(secret,*args,**kw)

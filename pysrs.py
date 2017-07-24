@@ -10,7 +10,7 @@ import SRS
 import SES
 import re
 import os
-from ConfigParser import ConfigParser, DuplicateSectionError
+from configparser import ConfigParser, DuplicateSectionError
 import SocketMap
 import time
 import sys
@@ -19,9 +19,9 @@ class SRSHandler(SocketMap.Handler):
 
   def log(self,*msg):
     # print "%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S'),self.id),
-    print "%s" % (time.strftime('%Y%b%d %H:%M:%S'),),
-    for i in msg: print i,
-    print
+    print("%s" % (time.strftime('%Y%b%d %H:%M:%S'),), end=' ')
+    for i in msg: print(i, end=' ')
+    print()
     sys.stdout.flush()
 
   bracketRE = re.compile(r'[<>]')
@@ -154,10 +154,10 @@ def main(args):
     
   daemon.server.srs = srs
   daemon.server.ses = ses
-  print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
+  print("%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S'))
   sys.stdout.flush()
   daemon.run()
-  print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
+  print("%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S'))
 
 if __name__ == "__main__":
   main(sys.argv[1:])

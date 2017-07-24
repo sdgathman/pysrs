@@ -22,7 +22,7 @@
 # it under the same terms as Python itself.
 
 import SRS
-from Base import Base
+from .Base import Base
 
 class Shortcut(Base):
 

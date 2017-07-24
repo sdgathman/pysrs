@@ -22,7 +22,7 @@
 # it under the same terms as Python itself.
 
 import SRS
-from Shortcut import Shortcut
+from .Shortcut import Shortcut
 
 class Reversible(Shortcut):
 

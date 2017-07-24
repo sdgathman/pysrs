@@ -53,7 +53,7 @@ BASE='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
 def longbits(hash,n):
   "Return leading n bits of hash digest converted to long."
   hashbits = 0
-  h = 0L
+  h = 0
   for b in hash:
     h = (h << 8) + ord(b)
     hashbits += 8
@@ -62,7 +62,7 @@ def longbits(hash,n):
   return h
 
 def bitpack(flds,*data):
-  bits = 0L
+  bits = 0
   for n,v in zip(flds,data):
     bits = (bits << n) | v
   return bits
@@ -72,7 +72,7 @@ def bitunpack(flds,bits):
   f = list(flds[1:])
   f.reverse()
   for n in f:
-    mask = (1L << n) - 1
+    mask = (1 << n) - 1
     a.insert(0,bits & mask)
     bits >>= n
   a.insert(0,bits)
@@ -100,7 +100,7 @@ class SES(object):
       self.secret = secret
     self.hashbits = hashbits
     self.chars = chars
-    self.last_id = 0L
+    self.last_id = 0
     self.frac_day = DAY >> fbits
     self.last_ts = int(time.time() / self.frac_day)
     tsbits = 1
@@ -125,7 +125,7 @@ class SES(object):
     return int(s / self.frac_day)
 
   def warn(self,*msg):
-    print >>sys.stderr,'WARNING:',' '.join(msg)
+    print('WARNING:',' '.join(msg), file=sys.stderr)
 
   def set_secret(self,*args):
     """ses.set_secret(new,old,...)
@@ -146,7 +146,7 @@ secrets are tried to see if the hash can be validated. Don't use "foo",
     if ts == self.last_ts:	# if still same fractional day
       msgid = self.last_id + 1	#   assign next sequential id
     else:
-      msgid = 1L
+      msgid = 1
     self.last_ts,self.last_id = ts,msgid
     return ts,msgid * self.nservers + self.server
 
@@ -272,8 +272,8 @@ if __name__ == '__main__':
   ses = SES('shhhh!')
   for a in sys.argv[1:]:
     if a.startswith('-m'):
-      ses.last_id = long(a[2:])
+      ses.last_id = int(a[2:])
     elif a.startswith('SES'):
-      print ses.verify(a)
+      print(ses.verify(a))
     else:
-      print ses.sign(a)
+      print(ses.sign(a))

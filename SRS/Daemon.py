@@ -25,14 +25,14 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-from Guarded import Guarded
+from .Guarded import Guarded
 import os
 import os.path
-import SocketServer
+import socketserver
 
 SRSSOCKET = '/tmp/srsd';
 
-class EximHandler(SocketServer.StreamRequestHandler):
+class EximHandler(socketserver.StreamRequestHandler):
 
   def handle(self):
     srs = self.server.srs
@@ -48,7 +48,7 @@ class EximHandler(SocketServer.StreamRequestHandler):
 	res = srs.reverse(*args)
       else:
 	raise ValueError("Invalid command %s" % cmd)
-    except Exception,x:
+    except Exception as x:
       res = "ERROR: %s"%x
     self.wfile.write(res+'\n')
 
@@ -81,7 +81,7 @@ and ensure the secret file is not empty."""
       os.unlink(socket)
     except:
       pass
-    self.server = SocketServer.UnixStreamServer(socket,EximHandler)
+    self.server = socketserver.UnixStreamServer(socket,EximHandler)
     self.server.srs = self.srs
 
   def run(self):

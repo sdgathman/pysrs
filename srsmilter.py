@@ -231,13 +231,13 @@ if __name__ == "__main__":
   config = Config(['spfmilter.cfg','/etc/mail/spfmilter.cfg'])
   miltername = config.miltername
   socketname = config.socketname
-  print """To use this with sendmail, add the following to sendmail.cf:
+  print("""To use this with sendmail, add the following to sendmail.cf:
 
 O InputMailFilters=%s
 X%s,        S=local:%s
 
 See the sendmail README for libmilter.
-sample srsmilter startup""" % (miltername,miltername,socketname)
+sample srsmilter startup""" % (miltername,miltername,socketname))
   sys.stdout.flush()
   Milter.runmilter("pysrsfilter",socketname,240)
-  print "sample srsmilter shutdown"
+  print("sample srsmilter shutdown")

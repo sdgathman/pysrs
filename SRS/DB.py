@@ -24,8 +24,8 @@
 import bsddb
 import time
 import SRS
-from Base import Base
-from cPickle import dumps, loads
+from .Base import Base
+from pickle import dumps, loads
 
 class DB(Base):
   """A MLDBM based Sender Rewriting Scheme

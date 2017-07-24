@@ -104,7 +104,7 @@ class Base(object):
     #self.ses0re = re.compile(r'^%s[-+=]' % SRS.SES0TAG,re.IGNORECASE)
 
   def warn(self,*msg):
-    print >>sys.stderr,'WARNING: ',' '.join(msg)
+    print('WARNING: ',' '.join(msg), file=sys.stderr)
 
   def sign(self,sender):
     """srsaddress = srs.sign(sender)

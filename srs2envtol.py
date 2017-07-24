@@ -11,7 +11,7 @@
 
 import SRS
 import re
-from ConfigParser import ConfigParser, DuplicateSectionError
+from configparser import ConfigParser, DuplicateSectionError
 
 # get SRS parameters from milter configuration
 cp = ConfigParser({
@@ -63,4 +63,4 @@ if __name__ == "__main__":
   import sys
   # No funny business in our output, please
   sys.stderr.close()
-  print reverse(sys.argv[1])
+  print(reverse(sys.argv[1]))

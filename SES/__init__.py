@@ -10,7 +10,7 @@ __all__= [
   '__version__'
 ]
 
-import ses
+from . import ses
 
 def new(secret=None,*args,**kw):
   return ses.SES(secret,*args,**kw)
