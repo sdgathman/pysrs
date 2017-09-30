@@ -3,7 +3,7 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
-__version__ = '0.30.10'
+__version__ = '1.0'
 
 __all__= [
   'new',
