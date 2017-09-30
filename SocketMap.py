@@ -5,14 +5,14 @@
 #
 # Base class for sendmail socket servers
 
-import SocketServer
+import socketserver
 
 class MapError(Exception):
   def __init__(self,code,reason):
     self.code = code
     self.reason = reason
 
-class Handler(SocketServer.StreamRequestHandler):
+class Handler(socketserver.StreamRequestHandler):
 
   def write(self,s):
     "write netstring to socket"
@@ -30,7 +30,7 @@ class Handler(SocketServer.StreamRequestHandler):
       if not ch in "0123456789":
         raise ValueError
       if len(n) >= maxlen:
-	raise OverflowError
+        raise OverflowError
       n += ch
       ch = file.read(1)
     return int(n)
@@ -53,28 +53,28 @@ class Handler(SocketServer.StreamRequestHandler):
     #self.log("connect")
     while True:
       try:
-	line = self.read()
-	self.log(line)
-	args = line.split(' ',1)
-	map = args.pop(0).replace('-','_')
-	meth = getattr(self, '_handle_' + map, None)
-	if not map:
-	  raise ValueError("Unrecognized map: %s" % map)
-	res = meth(*args)
-	self.write('OK ' + res)
+        line = self.read()
+        self.log(line)
+        args = line.split(' ',1)
+        map = args.pop(0).replace('-','_')
+        meth = getattr(self, '_handle_' + map, None)
+        if not map:
+          raise ValueError("Unrecognized map: %s" % map)
+        res = meth(*args)
+        self.write('OK ' + res)
       except EOFError:
         #self.log("Ending connection")
-	return
-      except MapError,x:
-	if code in ('PERM','TIMEOUT','NOTFOUND','OK','TEMP'):
-	  self.write("%s %s"%(x.code,x.reason))
-	else:
-	  self.write("%s %s %s"%('PERM',x.code,x.reason))
-      except LookupError,x:
+        return
+      except MapError as x:
+        if code in ('PERM','TIMEOUT','NOTFOUND','OK','TEMP'):
+          self.write("%s %s"%(x.code,x.reason))
+        else:
+          self.write("%s %s %s"%('PERM',x.code,x.reason))
+      except LookupError as x:
         self.write("NOTFOUND")
-      except Exception,x:
-	#print x
-	self.write("TEMP %s"%x)
+      except Exception as x:
+        #print x
+        self.write("TEMP %s"%x)
       # PERM,TIMEOUT
 
 # Application should subclass SocketMap.Daemon, and define
@@ -93,7 +93,7 @@ class Daemon(object):
     try:
       os.unlink(socket)
     except: pass
-    self.server = SocketServer.ThreadingUnixStreamServer(socket,handlerfactory)
+    self.server = socketserver.ThreadingUnixStreamServer(socket,handlerfactory)
     self.server.daemon = self
 
   def run(self):

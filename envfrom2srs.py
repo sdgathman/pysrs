@@ -11,7 +11,7 @@
 
 import SRS
 import re
-from ConfigParser import ConfigParser, DuplicateSectionError
+from configparser import ConfigParser, DuplicateSectionError
 
 # get SRS parameters from milter configuration
 cp = ConfigParser({
@@ -72,4 +72,4 @@ if __name__ == "__main__":
   sys.stderr.close()
   if len(sys.argv) > 2:
     fwdomain = sys.argv[-2]
-  print forward(sys.argv[-1])
+  print(forward(sys.argv[-1]))

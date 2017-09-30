@@ -36,6 +36,8 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
+from __future__ import print_function
+
 import time
 import hmac
 try: from hashlib import sha1 as sha
@@ -82,9 +84,9 @@ def parse_addr(sender):
 
 class Base(object):
   def __init__(self,secret=None,maxage=SRS.SRSMAXAGE,
-  	hashlength=SRS.SRSHASHLENGTH,
-	hashmin=None,separator='=',alwaysrewrite=False,ignoretimestamp=False,
-	allowunsafesrs=False):
+        hashlength=SRS.SRSHASHLENGTH,
+        hashmin=None,separator='=',alwaysrewrite=False,ignoretimestamp=False,
+        allowunsafesrs=False):
     if type(secret) == str:
       self.secret = (secret,)
     else:
@@ -104,7 +106,7 @@ class Base(object):
     #self.ses0re = re.compile(r'^%s[-+=]' % SRS.SES0TAG,re.IGNORECASE)
 
   def warn(self,*msg):
-    print >>sys.stderr,'WARNING: ',' '.join(msg)
+    print('WARNING: ',' '.join(msg), file=sys.stderr)
 
   def sign(self,sender):
     """srsaddress = srs.sign(sender)
@@ -242,7 +244,7 @@ and there may be collision problems with sender addresses)."""
 
     secret = self.get_secret()
     assert secret, "Cannot create a cryptographic MAC without a secret"
-    h = hmac.new(secret[0],'',sha)
+    h = hmac.new(secret[0].encode(),b'',sha)
     for i in data:
       h.update(i.lower())
     hash = base64.encodestring(h.digest())
@@ -261,9 +263,9 @@ with an old secret."""
     assert secret, "Cannot create a cryptographic MAC without a secret"
     hashes = []
     for s in secret:
-      h = hmac.new(s,'',sha)
+      h = hmac.new(s.encode(),b'',sha)
       for i in data:
-	h.update(i.lower())
+        h.update(i.lower())
       valid = base64.encodestring(h.digest())[:len(hash)]
       # We test all case sensitive matches before case insensitive
       # matches. While the risk of a case insensitive collision is
@@ -273,9 +275,9 @@ with an old secret."""
     hash = hash.lower()
     for h in hashes:
       if hash == h.lower():
-	self.warn("""SRS: Case insensitive hash match detected.
+        self.warn("""SRS: Case insensitive hash match detected.
 Someone smashed case in the local-part.""")
-	return True
+        return True
     return False;
 
   def set_secret(self,*args):

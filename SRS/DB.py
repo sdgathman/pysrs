@@ -21,19 +21,19 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-import bsddb
+import bsddb3
 import time
 import SRS
-from Base import Base
-from cPickle import dumps, loads
+from .Base import Base
+from pickle import dumps, loads
 
 class DB(Base):
   """A MLDBM based Sender Rewriting Scheme
 
 SYNOPSIS
 
-	from SRS.DB import DB
-	srs = DB(Database='/var/run/srs.db', ...)
+        from SRS.DB import DB
+        srs = DB(Database='/var/run/srs.db', ...)
 
 DESCRIPTION
 
@@ -53,7 +53,7 @@ The database is not garbage collected."""
   def __init__(self,database='/var/run/srs.db',hashlength=24,*args,**kw):
     Base.__init__(self,hashlength=hashlength,*args,**kw)
     assert database, "No database specified for SRS.DB"
-    self.dbm = bsddb.btopen(database,'c')
+    self.dbm = bsddb3.btopen(database,'c')
 
   def compile(self,sendhost,senduser,srshost=None):
     ts = time.time()
@@ -61,24 +61,24 @@ The database is not garbage collected."""
     data = dumps((ts,sendhost,senduser))
 
     # We rely on not getting collisions in this hash.
-    hash = self.hash_create(sendhost,senduser)
+    hash = self.hash_create(sendhost.encode(),senduser.encode())
 
     self.dbm[hash] = data
 
     # Note that there are 4 fields here and that sendhost may
     # not contain a + sign. Therefore, we do not need to escape
     # + signs anywhere in order to reverse this transformation.
-    return SRS.SRS0TAG + self.separator + hash
+    return SRS.SRS0TAG + self.separator + hash.decode()
 
   def parse(self,user,srshost=None):
     user,m = self.srs0re.subn('',user,1)
     assert m, "Reverse address does not match %s." % self.srs0re.pattern
 
     hash = user
-    data = self.dbm[hash]
+    data = self.dbm[hash.encode()]
     ts,sendhost,senduser = loads(data)
 
-    assert self.hash_verify(hash,sendhost,senduser), "Invalid hash"
+    assert self.hash_verify(hash.encode(),sendhost.encode(),senduser.encode()), "Invalid hash"
 
     assert self.time_check(ts), "Invalid timestamp"
 

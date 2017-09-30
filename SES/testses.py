@@ -4,7 +4,7 @@
 # it under the same terms as Python itself.
 #
 import unittest
-import ses
+from . import ses
 import time
 
 class SESTestCase(unittest.TestCase):
@@ -13,7 +13,7 @@ class SESTestCase(unittest.TestCase):
     self.ses = ses.SES('shhh!')
 
   def testEncode(self):
-    for bits in (0L,1L,1234L,123738493059846347859040389523479L):
+    for bits in (0,1,1234,123738493059846347859040389523479):
       s = self.ses.encode(bits)
       self.assertEqual(bits,self.ses.decode(s))
 
@@ -24,10 +24,10 @@ class SESTestCase(unittest.TestCase):
       self.assertEqual(tc,self.ses.get_timecode(secs))
 
   def testHash(self):
-    data = ('now','is','the','time')
+    data = (b'now', b'is', b'the', b'time')
     h = self.ses.hash_create(*data)
-    self.failUnless(self.ses.hash_verify(h,*data))
-    self.failUnless(not self.ses.hash_verify(h,'some','other','data'))
+    self.assertTrue(self.ses.hash_verify(h,*data))
+    self.assertTrue(not self.ses.hash_verify(h, b'some', b'other', b'data'))
 
   def testMessageID(self):
     while True:
@@ -44,20 +44,20 @@ class SESTestCase(unittest.TestCase):
 
   def testSigpack(self):
     tc = 50000
-    h = self.ses.hash_create('some','data')
-    for msgid in (1L,100000L,12345657423784L):
+    h = self.ses.hash_create(b'some',b'data')
+    for msgid in (1,100000,12345657423784):
       sig = self.ses.sig_create(msgid,tc,h)
       ts = tc + 30
       msgid2,tc2,h2 = self.ses.sig_extract(sig,ts)
-      self.failUnless(tc2 <= ts)
+      self.assertTrue(tc2 <= ts)
       self.assertEqual(msgid,msgid2)
       self.assertEqual(tc,tc2)
       self.assertEqual(h,h2)
       ts = tc + 200
       msgid2,tc2,h2 = self.ses.sig_extract(sig,ts)
-      self.failUnless(tc2 <= ts)
+      self.assertTrue(tc2 <= ts)
       self.assertEqual(msgid,msgid2)
-      self.failIfEqual(tc,tc2)
+      self.assertNotEqual(tc,tc2)
       self.assertEqual(h,h2)
 
   def get_timecode(self):
@@ -69,8 +69,8 @@ class SESTestCase(unittest.TestCase):
     self.timecode = 60000
     a = 'mickey@Mouse.com'
     sig = self.ses.sign(a)
-    self.failUnless(sig.endswith(a))
-    self.failUnless(sig.startswith('SES='))
+    self.assertTrue(sig.endswith(a))
+    self.assertTrue(sig.startswith('SES='))
     res = self.ses.verify(sig)
     self.assertEqual(res,(a,self.timecode,self.ses.last_id))
     res2 = self.ses.verify(sig.lower())
@@ -97,7 +97,7 @@ class SESTestCase(unittest.TestCase):
     sig2 = self.ses.sign(a)
     self.assertNotEqual(sig,sig2)
     # but passing a msgid generates a fixed sig
-    msgid = 12345678L
+    msgid = 12345678
     sig = self.ses.sign(a,msgid)
     sig2 = self.ses.sign(a,msgid)
     self.assertEqual(sig,sig2)
