@@ -33,21 +33,21 @@ http://www.libsrs2.org/
         author = 'Stuart Gathman (Perl version by Shevek)', 
         author_email = 'stuart@bmsi.com',
         url = 'http://bmsi.com/python/pysrs.html',
-	py_modules = ['SocketMap'],
+        py_modules = ['SocketMap'],
         packages = ['SRS','SES'],
-	scripts = ['envfrom2srs.py','srs2envtol.py'],
-	keywords = ['SPF','SRS','SES'],
-	classifiers = [
-	  'Development Status :: 5 - Production/Stable',
-	  'Environment :: No Input/Output (Daemon)',
-	  'Intended Audience :: Developers',
-	  'Intended Audience :: System Administrators',
-	  'License :: OSI Approved :: Python License (CNRI Python License)',
-	  'Natural Language :: English',
-	  'Operating System :: OS Independent',
-	  'Programming Language :: Python',
-	  'Topic :: Communications :: Email',
-	  'Topic :: Communications :: Email :: Mail Transport Agents',
-	  'Topic :: Software Development :: Libraries :: Python Modules'
-	]
+        scripts = ['envfrom2srs.py','srs2envtol.py'],
+        keywords = ['SPF','SRS','SES'],
+        classifiers = [
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: No Input/Output (Daemon)',
+          'Intended Audience :: Developers',
+          'Intended Audience :: System Administrators',
+          'License :: OSI Approved :: Python License (CNRI Python License)',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Programming Language :: Python',
+          'Topic :: Communications :: Email',
+          'Topic :: Communications :: Email :: Mail Transport Agents',
+          'Topic :: Software Development :: Libraries :: Python Modules'
+        ]
 )

@@ -11,7 +11,7 @@
 
 import SRS
 import re
-from ConfigParser import ConfigParser, DuplicateSectionError
+from configparser import ConfigParser, DuplicateSectionError
 
 # get SRS parameters from milter configuration
 cp = ConfigParser({
@@ -50,7 +50,7 @@ def reverse(old_address):
     use_address = srs.reverse(use_address)
     while True:
       try:
-	use_address = srs.reverse(use_address)
+        use_address = srs.reverse(use_address)
       except: break
     return use_address.replace('@','<@',1)+'.>'
   except:
@@ -63,4 +63,4 @@ if __name__ == "__main__":
   import sys
   # No funny business in our output, please
   sys.stderr.close()
-  print reverse(sys.argv[1])
+  print(reverse(sys.argv[1]))

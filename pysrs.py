@@ -10,7 +10,7 @@ import SRS
 import SES
 import re
 import os
-from ConfigParser import ConfigParser, DuplicateSectionError
+from configparser import ConfigParser, DuplicateSectionError
 import SocketMap
 import time
 import sys
@@ -19,9 +19,9 @@ class SRSHandler(SocketMap.Handler):
 
   def log(self,*msg):
     # print "%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S'),self.id),
-    print "%s" % (time.strftime('%Y%b%d %H:%M:%S'),),
-    for i in msg: print i,
-    print
+    print("%s" % (time.strftime('%Y%b%d %H:%M:%S'),), end=' ')
+    for i in msg: print(i, end=' ')
+    print()
     sys.stdout.flush()
 
   bracketRE = re.compile(r'[<>]')
@@ -66,17 +66,17 @@ class SRSHandler(SocketMap.Handler):
       return old_address
     except:
       try:
-	senduser,sendhost = use_address.split('@')
-	shl = sendhost.lower()
-	if shl in sesdomain:
-	  new_address = ses.sign(use_address)
-	elif shl in signdomain:
-	  new_address = srs.sign(use_address)
-	else:
-	  new_address = srs.forward(use_address,fwdomain)
-	return new_address.replace('@','<@',1)+'.>'
+        senduser,sendhost = use_address.split('@')
+        shl = sendhost.lower()
+        if shl in sesdomain:
+          new_address = ses.sign(use_address)
+        elif shl in signdomain:
+          new_address = srs.sign(use_address)
+        else:
+          new_address = srs.forward(use_address,fwdomain)
+        return new_address.replace('@','<@',1)+'.>'
       except:
-	return old_address
+        return old_address
 
   def _handle_reverse_srs(self,old_address):
 
@@ -98,15 +98,15 @@ class SRSHandler(SocketMap.Handler):
         return a[0].replace('@','<@',1)+'.>'
       use_address = srs.reverse(use_address)
       while True:
-	try:
-	  use_address = srs.reverse(use_address)
-	except: break
+        try:
+          use_address = srs.reverse(use_address)
+        except: break
       return use_address.replace('@','<@',1)+'.>'
     except:
       if use_address.startswith('|'):
-	return '"%s"' % old_address
+        return '"%s"' % old_address
       else:
-	return old_address
+        return old_address
 
 def main(args):
 # get SRS parameters from milter configuration
@@ -144,20 +144,20 @@ def main(args):
   daemon.server.nosrsdomain = ()
   if cp.has_option('srs','ses'):
     daemon.server.sesdomain = [
-    	q.strip() for q in cp.get('srs','ses').split(',')]
+            q.strip() for q in cp.get('srs','ses').split(',')]
   if cp.has_option('srs','sign'):
     daemon.server.signdomain = [
-    	q.strip() for q in cp.get('srs','sign').split(',')]
+            q.strip() for q in cp.get('srs','sign').split(',')]
   if cp.has_option('srs','nosrs'):
     daemon.server.nosrsdomain = [
-    	q.strip() for q in cp.get('srs','nosrs').split(',')]
+            q.strip() for q in cp.get('srs','nosrs').split(',')]
     
   daemon.server.srs = srs
   daemon.server.ses = ses
-  print "%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S')
+  print("%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S'))
   sys.stdout.flush()
   daemon.run()
-  print "%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S')
+  print("%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S'))
 
 if __name__ == "__main__":
   main(sys.argv[1:])

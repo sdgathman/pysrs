@@ -39,6 +39,8 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 #
+from __future__ import print_function
+
 import time
 import hmac
 try: from hashlib import sha1 as sha
@@ -53,16 +55,19 @@ BASE='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
 def longbits(hash,n):
   "Return leading n bits of hash digest converted to long."
   hashbits = 0
-  h = 0L
+  h = 0
   for b in hash:
-    h = (h << 8) + ord(b)
+    if type(b) == int:
+        h = (h << 8) + b
+    elif type(b) == str:
+        h = (h << 8) + ord(b)
     hashbits += 8
     if hashbits >= n:
       return h >> (hashbits - n)
   return h
 
 def bitpack(flds,*data):
-  bits = 0L
+  bits = 0
   for n,v in zip(flds,data):
     bits = (bits << n) | v
   return bits
@@ -72,7 +77,7 @@ def bitunpack(flds,bits):
   f = list(flds[1:])
   f.reverse()
   for n in f:
-    mask = (1L << n) - 1
+    mask = (1 << n) - 1
     a.insert(0,bits & mask)
     bits >>= n
   a.insert(0,bits)
@@ -93,14 +98,14 @@ def bitunpack(flds,bits):
 class SES(object):
 
   def __init__(self,secret,hashbits=80,expiration=10,fbits=2,chars=BASE,
-  	nservers=1,server=0,maxval=3):
+          nservers=1,server=0,maxval=3):
     if type(secret) == str:
       self.secret = (secret,)
     else:
       self.secret = secret
     self.hashbits = hashbits
     self.chars = chars
-    self.last_id = 0L
+    self.last_id = 0
     self.frac_day = DAY >> fbits
     self.last_ts = int(time.time() / self.frac_day)
     tsbits = 1
@@ -125,7 +130,7 @@ class SES(object):
     return int(s / self.frac_day)
 
   def warn(self,*msg):
-    print >>sys.stderr,'WARNING:',' '.join(msg)
+    print('WARNING:',' '.join(msg), file=sys.stderr)
 
   def set_secret(self,*args):
     """ses.set_secret(new,old,...)
@@ -146,7 +151,7 @@ secrets are tried to see if the hash can be validated. Don't use "foo",
     if ts == self.last_ts:	# if still same fractional day
       msgid = self.last_id + 1	#   assign next sequential id
     else:
-      msgid = 1L
+      msgid = 1
     self.last_ts,self.last_id = ts,msgid
     return ts,msgid * self.nservers + self.server
 
@@ -185,7 +190,7 @@ and there may be collision problems with sender addresses)."""
 
     secret = self.get_secret()
     assert secret, "Cannot create a cryptographic MAC without a secret"
-    h = hmac.new(secret[0],'',sha)
+    h = hmac.new(secret[0].encode(),b'',sha)
     for i in data:
       h.update(i)
     return longbits(h.digest(),self.hashbits)
@@ -202,18 +207,18 @@ with an old secret."""
     assert secret, "Cannot verify a cryptographic MAC without a secret"
     hashes = []
     for s in secret:
-      h = hmac.new(s,'',sha)
+      h = hmac.new(s.encode(), b'',sha)
       for i in data:
-	h.update(i)
+        h.update(i)
       if hash == longbits(h.digest(),self.hashbits):
         return True
     return False;
 
   def sig_create(self,msgid,ts,h):
     """Return encoded signature.
-    	msgid - long integer id unique for timecode
-    	ts    - 32 bit timecode: day fractions since epoch
-	h     - long with high order self.hashbits bits of hash digest"""
+       msgid - long integer id unique for timecode
+       ts    - 32 bit timecode: day fractions since epoch
+       h     - long with high order self.hashbits bits of hash digest"""
     if ts:
       return self.encode(bitpack(self.flds,msgid,ts % self.tcmask,h))
     else:
@@ -221,28 +226,28 @@ with an old secret."""
 
   def sig_extract(self,sig,ts):
     """Return msgid,timecode,hash extracted from sig.
-	sig - encoded sig returned by sig_create
-	ts  - the current timecode
+       sig - encoded sig returned by sig_create
+       ts  - the current timecode
     """
     msgid,tc,hash = bitunpack(self.flds,self.decode(sig))
     tcmask = self.tcmask
     if tc != tcmask:
       tc = ts // tcmask * tcmask + int(tc)
       if tc > ts:
-	tc -= tcmask
+        tc -= tcmask
     else:
       tc = 0
     return msgid,tc,hash
    
   def sign(self,address,msgid=None):
     """Return signed address.
-	if msgid is supplied, a fixed signature is generated."""
+       if msgid is supplied, a fixed signature is generated."""
     local,domain = address.split('@',1)
     if msgid:	# fixed sig
       ts = 0
     else:
       ts,msgid = self.create_message_id()
-    h = self.hash_create(struct.pack('>QQ',ts,msgid),local,'@',domain.lower())
+    h = self.hash_create(struct.pack('>QQ',ts,msgid),local.encode(),b'@',domain.lower().encode())
     t = self.sig_create(msgid,ts,h)
     return 'SES=%s=%s@%s' % (t,local,domain)
 
@@ -251,19 +256,19 @@ with an old secret."""
     unchanged if signature is invalid."""
     if address.upper().startswith('SES='):
       try:
-	local,domain = address.split('@',1)
-	tag,sig,user = local.split('=')
+        local,domain = address.split('@',1)
+        tag,sig,user = local.split('=')
       except ValueError:
-	raise ValueError("Invalid SES signature format: %s" % local)
+        raise ValueError("Invalid SES signature format: %s" % local)
       ts = self.get_timecode()
       msgid,tc,h = self.sig_extract(sig,ts)
       if not tc or ts - tc < self.expiration and self.hash_verify(h,
-      	struct.pack('>QQ',tc,msgid),user,'@',domain.lower()):
-	if tc:	# count validations
-	  self.valtrack[msgid] = cnt = self.valtrack.get(msgid,0) + 1
-	  if cnt > self.maxval:
-	    raise RuntimeError(
-	      "Too many validations of signature: %s" % address)
+              struct.pack('>QQ',tc,msgid),user.encode(),b'@',domain.lower().encode()):
+        if tc:	# count validations
+          self.valtrack[msgid] = cnt = self.valtrack.get(msgid,0) + 1
+          if cnt > self.maxval:
+            raise RuntimeError(
+              "Too many validations of signature: %s" % address)
         return user + '@' + domain,tc,msgid
     return address,
 
@@ -272,8 +277,8 @@ if __name__ == '__main__':
   ses = SES('shhhh!')
   for a in sys.argv[1:]:
     if a.startswith('-m'):
-      ses.last_id = long(a[2:])
+      ses.last_id = int(a[2:])
     elif a.startswith('SES'):
-      print ses.verify(a)
+      print(ses.verify(a))
     else:
-      print ses.sign(a)
+      print(ses.sign(a))

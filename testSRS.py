@@ -56,20 +56,20 @@ class SRSTestCase(unittest.TestCase):
   def testGuarded(self):
     srs = Guarded()
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     srs.separator = '+'
     sender = '"Blah blah"@orig.com'
     srsaddr = srs.forward(sender,sender)
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
-    self.failUnless(srsaddr.startswith('"'+SRS.SRS0TAG),srsaddr)
+    self.assertTrue(srsaddr.startswith('"'+SRS.SRS0TAG),srsaddr)
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith('"'+SRS.SRS1TAG))
+    self.assertTrue(srsaddr1.startswith('"'+SRS.SRS1TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith('"'+SRS.SRS1TAG))
+    self.assertTrue(srsaddr2.startswith('"'+SRS.SRS1TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr,addr)
     addr = srs.reverse(srsaddr1)
@@ -97,17 +97,17 @@ class SRSTestCase(unittest.TestCase):
     # FIXME: whether case smashing occurs depends on what day it is.
     sender = 'mouse@fickle1.com'
     srsaddr = srs.forward(sender,'second.com')
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     self.case_smashed = False
     srs.warn = self.warn
     addr = srs.reverse(srsaddr.lower())
-    self.failUnless(self.case_smashed)	# check that warn was called
+    self.assertTrue(self.case_smashed)	# check that warn was called
     self.assertEqual(sender,addr)
 
   def testReversible(self):
     srs = Reversible()
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     srs.separator = '+'
     sender = 'mouse@orig.com'
@@ -115,13 +115,13 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
     #print srsaddr
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     srsaddr1 = srs.forward(srsaddr,'third.com')
     #print srsaddr1
-    self.failUnless(srsaddr1.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr1.startswith(SRS.SRS0TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
     #print srsaddr2
-    self.failUnless(srsaddr2.startswith(SRS.SRS0TAG))
+    self.assertTrue(srsaddr2.startswith(SRS.SRS0TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr1,addr)
     addr = srs.reverse(srsaddr1)
@@ -132,20 +132,20 @@ class SRSTestCase(unittest.TestCase):
   def testDB(self,database='/tmp/srstest'):
     srs = DB(database=database)
     self.assertRaises(AssertionError,srs.forward,
-    	'mouse@disney.com','mydomain.com')
+            'mouse@disney.com','mydomain.com')
     srs.set_secret('shhhh!')
     sender = 'mouse@orig.com'
     srsaddr = srs.forward(sender,sender)
     self.assertEqual(srsaddr,sender)
     srsaddr = srs.forward(sender,'second.com')
-    #print srsaddr
-    self.failUnless(srsaddr.startswith(SRS.SRS0TAG))
+    #print(srsaddr)
+    self.assertTrue(srsaddr.startswith(SRS.SRS0TAG))
     srsaddr1 = srs.forward(srsaddr,'third.com')
-    #print srsaddr1
-    self.failUnless(srsaddr1.startswith(SRS.SRS0TAG))
+    #print(srsaddr1)
+    self.assertTrue(srsaddr1.startswith(SRS.SRS0TAG))
     srsaddr2 = srs.forward(srsaddr1,'fourth.com')
-    #print srsaddr2
-    self.failUnless(srsaddr2.startswith(SRS.SRS0TAG))
+    #print(srsaddr2)
+    self.assertTrue(srsaddr2.startswith(SRS.SRS0TAG))
     addr = srs.reverse(srsaddr2)
     self.assertEqual(srsaddr1,addr)
     addr = srs.reverse(srsaddr1)
@@ -160,7 +160,7 @@ class SRSTestCase(unittest.TestCase):
   def sendcmd(self,*args):
     sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     sock.connect(self.sockname)
-    sock.send(' '.join(args)+'\n')
+    sock.send(b' '.join(args)+b'\n')
     res = sock.recv(128).strip()
     sock.close()
     return res
@@ -170,9 +170,9 @@ class SRSTestCase(unittest.TestCase):
     self.daemon = Daemon(socket=sockname,secret=secret)
     server = threading.Thread(target=self.run2,name='srsd')
     server.start()
-    sender = 'mouse@orig.com'
-    srsaddr = self.sendcmd('FORWARD',sender,'second.com')
-    addr = self.sendcmd('REVERSE',srsaddr)
+    sender = b'mouse@orig.com'
+    srsaddr = self.sendcmd(b'FORWARD',sender,b'second.com')
+    addr = self.sendcmd(b'REVERSE',srsaddr)
     server.join()
     self.assertEqual(sender,addr)
 
@@ -181,7 +181,7 @@ class SRSTestCase(unittest.TestCase):
     import srs2envtol
     orig = 'mickey<@orig.com.>'
     newaddr = envfrom2srs.forward(orig)
-    self.failUnless(newaddr.endswith('.>'))
+    self.assertTrue(newaddr.endswith('.>'))
     addr2 = srs2envtol.reverse(newaddr)
     self.assertEqual(addr2,orig)
     # check case smashing by braindead mailers
@@ -189,7 +189,7 @@ class SRSTestCase(unittest.TestCase):
     srs2envtol.srs.warn = self.warn
     addr2 = srs2envtol.reverse(newaddr.lower())
     self.assertEqual(addr2,orig)
-    self.failUnless(self.case_smashed)
+    self.assertTrue(self.case_smashed)
 
 def suite(): return unittest.makeSuite(SRSTestCase,'test')
 

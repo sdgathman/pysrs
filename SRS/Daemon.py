@@ -25,32 +25,32 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-from Guarded import Guarded
+from .Guarded import Guarded
 import os
 import os.path
-import SocketServer
+import socketserver
 
 SRSSOCKET = '/tmp/srsd';
 
-class EximHandler(SocketServer.StreamRequestHandler):
+class EximHandler(socketserver.StreamRequestHandler):
 
   def handle(self):
     srs = self.server.srs
     sock = self.rfile
     try:
       line = self.rfile.readline()
-      #print "Read '%s' on %s\n" % (line.strip(),self.request)
-      args = line.split()
+      # print("Read '%s' on %s\n" % (line.strip(),self.request))
+      args = line.decode().split()
       cmd = args.pop(0).upper()
       if cmd == 'FORWARD':
-	res = srs.forward(*args)
+        res = srs.forward(*args)
       elif cmd == 'REVERSE':
-	res = srs.reverse(*args)
+        res = srs.reverse(*args)
       else:
-	raise ValueError("Invalid command %s" % cmd)
-    except Exception,x:
+        raise ValueError("Invalid command %s" % cmd)
+    except Exception as x:
       res = "ERROR: %s"%x
-    self.wfile.write(res+'\n')
+    self.wfile.write((res+'\n').encode())
 
 
 class Daemon(object):
@@ -60,12 +60,12 @@ class Daemon(object):
     if secret: secrets += secret
     if secretfile and os.path.exists(secretfile):
       assert os.path.isfile(secretfile) and os.access(secretfile,os.R_OK), \
-	"Secret file $secretfile not readable"
+        "Secret file $secretfile not readable"
       FH = open(secretfile)
       for ln in FH:
         if not ln: continue
-	if ln.startswith('#'): continue
-	secrets += ln
+        if ln.startswith('#'): continue
+        secrets += ln
       FH.close()
 
     assert secrets, \
@@ -81,7 +81,7 @@ and ensure the secret file is not empty."""
       os.unlink(socket)
     except:
       pass
-    self.server = SocketServer.UnixStreamServer(socket,EximHandler)
+    self.server = socketserver.UnixStreamServer(socket,EximHandler)
     self.server.srs = self.srs
 
   def run(self):
