@@ -19,7 +19,7 @@ setup(
         #-- Package description
         name = 'pysrs',
         license = 'Python license',
-        version = '1.0',
+        version = '1.0.1',
         description = 'Python SRS (Sender Rewriting Scheme) library',
         long_description = """Python SRS (Sender Rewriting Scheme) library.
 As SPF is implemented, MTAs that check SPF must account for any forwarders.

@@ -5,8 +5,8 @@
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
-Version: 1.0
-Release: 4
+Version: 1.0.1
+Release: 1
 Source: https://github.com/sdgathman/%{name}/archive/%{name}-%{version}.tar.gz
 Patch: %{name}-%{version}.patch
 License: Python license
@@ -102,6 +102,9 @@ fi
 /usr/lib/pymilter/pysrs.py
 
 %changelog
+* Sat Sep 30 2017 Stuart Gathman <stuart@gathman.org> 1.0.1-1
+- Support both python2 and python3
+
 * Sat Mar  1 2014 Stuart Gathman <stuart@gathman.org> 1.0-4
 - Fix initscript error
 

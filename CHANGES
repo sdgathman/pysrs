@@ -1,3 +1,10 @@
+1.0.1	Support python3
+1.0	Use daemonize instead of start.sh, which is gone from pymilter
+	- Foundation for python milter envfrom rewriting (in progress)
+	- Python 2.6
+	- Depend on pymilter for dirs, even though we don't
+	  really need it for anything else until envfrom rewriting is done.
+0.30.12 Support logging recipient host, and nosrs in pysrs.cfg
 0.30.11 Support SRS signing mode.
 0.30.10	Support SES
 0.30.9	Support sendmail socket map.
