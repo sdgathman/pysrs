@@ -1,23 +1,39 @@
-%define sysvinit pysrs.rc
-%define __python python2.6
-# set to python26 for EL4,EL5
-%define pythonbase python
+%if 0%{?rhel} == 6
+%global __python python2.6
+%global sysvinit pysrs.rc
+%endif
+
+%global pythonbase python
+%global use_systemd 1
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
 Version: 1.0.1
-Release: 1
-Source: https://github.com/sdgathman/%{name}/archive/%{name}-%{version}.tar.gz
-Patch: %{name}-%{version}.patch
+Release: 1%{?dist}
+Source0: pysrs-%{version}.tar.gz
 License: Python license
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
+BuildRequires: python >= 2.6
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
-Requires: chkconfig, %{pythonbase}, daemonize
-Url: http://bmsi.com/python/pysrs.html
+Requires: %{pythonbase} sendmail sendmail-cf
+
+%if %{use_systemd}
+# systemd macros are not defined unless systemd is present
+BuildRequires: systemd
+Requires: systemd
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+%else
+BuildRequires:  ed
+Requires: chkconfig, daemonize
+%endif
+
+Url: http://pythonhosted.org/milter/pysrs.html
 
 %description
 Python SRS (Sender Rewriting Scheme) library.
@@ -34,7 +50,6 @@ used as a form of authentication.
 
 %prep
 %setup -n pysrs-%{version}
-%patch -p0 -b.sdg
 
 %build
 %{__python} setup.py build
@@ -56,8 +71,12 @@ cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 
 # We use same log dir as milter since we also are a sendmail add-on
 mkdir -p $RPM_BUILD_ROOT/var/log/milter
-mkdir -p $RPM_BUILD_ROOT/var/run/milter
-mkdir -p $RPM_BUILD_ROOT/usr/lib/pymilter
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/pymilter
+cp -p pysrs.py $RPM_BUILD_ROOT%{_libdir}/pymilter/pysrs
+%if %{use_systemd}
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
+cp -p pysrs.service $RPM_BUILD_ROOT%{_unitdir}
+%else
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 cp %{sysvinit} $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs
 ed $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs <<'EOF'
@@ -68,7 +87,7 @@ python="%{__python}"
 w
 q
 EOF
-cp -p pysrs.py $RPM_BUILD_ROOT/usr/lib/pymilter
+%endif
 
 # logfile rotation
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
@@ -82,6 +101,19 @@ EOF
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if %{use_systemd}
+
+%post
+%systemd_post pysrs.service
+
+%postun
+%systemd_postun_with_restart pysrs.service
+
+%preun
+%systemd_preun pysrs.service
+
+%else
+
 %post
 #echo "Syntax of HACK(pysrs) has changed.  Update sendmail.mc."
 /sbin/chkconfig --add pysrs
@@ -91,19 +123,28 @@ if [ $1 = 0 ]; then
   /sbin/chkconfig --del pysrs
 fi
 
+%endif
+
 %files -f INSTALLED_FILES
 %doc COPYING LICENSE.python LICENSE.sendmail CHANGES
 %defattr(-,root,root)
 %config(noreplace) /etc/mail/pysrs.cfg
 %config(noreplace) /etc/mail/no-srs-mailers
 /etc/logrotate.d/pysrs
-/etc/rc.d/init.d/pysrs
 /usr/share/sendmail-cf/hack/*
-/usr/lib/pymilter/pysrs.py
+%{_libdir}/pymilter/pysrs
+%if %{use_systemd}
+%{_unitdir}/*
+%else
+/etc/rc.d/init.d/pysrs
+%endif
 
 %changelog
-* Sat Sep 30 2017 Stuart Gathman <stuart@gathman.org> 1.0.1-1
-- Support both python2 and python3
+* Tue Oct 17 2017 Stuart Gathman <stuart@gathman.org> 1.0.1-1
+- Initial python3 port
+
+* Fri Sep 15 2017 Stuart Gathman <stuart@gathman.org> 1.0-5
+- Port to EL7 and systemd
 
 * Sat Mar  1 2014 Stuart Gathman <stuart@gathman.org> 1.0-4
 - Fix initscript error

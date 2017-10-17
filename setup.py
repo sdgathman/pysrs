@@ -31,8 +31,8 @@ The Perl reference implementation and a C implementation are at
 http://www.libsrs2.org/
 """,
         author = 'Stuart Gathman (Perl version by Shevek)', 
-        author_email = 'stuart@bmsi.com',
-        url = 'http://bmsi.com/python/pysrs.html',
+        author_email = 'stuart@gathman.org',
+        url = 'http://pythonhosted.org/milter/pysrs.html',
         py_modules = ['SocketMap'],
         packages = ['SRS','SES'],
         scripts = ['envfrom2srs.py','srs2envtol.py'],
