@@ -1,0 +1,15 @@
+[Unit]
+Description=Python SRS daemon
+Wants=network.target
+After=network-online.target sendmail.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/log/milter
+User=mail
+Group=mail
+SyslogIdentifier=pysrs
+ExecStart=/usr/lib64/pymilter/pysrs
+
+[Install]
+WantedBy=multi-user.target
