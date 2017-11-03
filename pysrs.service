@@ -9,7 +9,7 @@ WorkingDirectory=/var/log/milter
 User=mail
 Group=mail
 SyslogIdentifier=pysrs
-ExecStart=/usr/lib64/pymilter/pysrs
+ExecStart=/usr/libexec/milter/pysrs
 
 [Install]
 WantedBy=multi-user.target

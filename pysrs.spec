@@ -8,7 +8,7 @@
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
-Version: 1.0.1
+Version: 1.0.2
 Release: 1%{?dist}
 Source0: pysrs-%{version}.tar.gz
 License: Python license
@@ -71,8 +71,8 @@ cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 
 # We use same log dir as milter since we also are a sendmail add-on
 mkdir -p $RPM_BUILD_ROOT/var/log/milter
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/pymilter
-cp -p pysrs.py $RPM_BUILD_ROOT%{_libdir}/pymilter/pysrs
+mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/milter
+cp -p pysrs.py $RPM_BUILD_ROOT%{_libexecdir}/milter/pysrs
 %if %{use_systemd}
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 cp -p pysrs.service $RPM_BUILD_ROOT%{_unitdir}
@@ -132,7 +132,7 @@ fi
 %config(noreplace) /etc/mail/no-srs-mailers
 /etc/logrotate.d/pysrs
 /usr/share/sendmail-cf/hack/*
-%{_libdir}/pymilter/pysrs
+%{_libexecdir}/milter/pysrs
 %if %{use_systemd}
 %{_unitdir}/*
 %else
@@ -140,6 +140,10 @@ fi
 %endif
 
 %changelog
+* Tue Nov  3 2017 Stuart Gathman <stuart@gathman.org> 1.0.2-1
+- Fix daemon to run in python2
+- Move daemons to /usr/libexec/milter so they get bin_t selinux label
+
 * Tue Oct 17 2017 Stuart Gathman <stuart@gathman.org> 1.0.1-1
 - Initial python3 port
 
