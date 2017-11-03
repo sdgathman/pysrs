@@ -5,12 +5,15 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
-
+from __future__ import print_function
 import SRS
 import SES
 import re
 import os
-from configparser import ConfigParser, DuplicateSectionError
+try:
+  from configparser import ConfigParser, DuplicateSectionError
+except:
+  from ConfigParser import ConfigParser, DuplicateSectionError
 import SocketMap
 import time
 import sys

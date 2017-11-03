@@ -5,7 +5,10 @@
 #
 # Base class for sendmail socket servers
 
-import socketserver
+try:
+  import socketserver
+except:
+  import SocketServer as socketserver
 
 class MapError(Exception):
   def __init__(self,code,reason):
