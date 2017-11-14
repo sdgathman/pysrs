@@ -223,7 +223,7 @@ class srsMilter(Milter.Base):
       self.nosrsrcpt.append(to)
     return Milter.CONTINUE
 
-  def eoh(self):
+  def data(self):
     if not self.data_allowed:
       return Milter.REJECT
     return Milter.CONTINUE
@@ -243,7 +243,7 @@ class srsMilter(Milter.Base):
 
 if __name__ == "__main__":
   global config
-  config = Config(['srsmilter.cfg','/etc/mail/srsmilter.cfg'])
+  config = Config(['pysrs.cfg','/etc/mail/pysrs.cfg'])
   Milter.factory = srsMilter
   if config.miltersrs:
     flags = Milter.CHGFROM + Milter.DELRCPT

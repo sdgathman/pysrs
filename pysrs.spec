@@ -135,6 +135,7 @@ fi
 /etc/logrotate.d/pysrs
 /usr/share/sendmail-cf/hack/*
 %{_libexecdir}/milter/pysrs
+%{_libexecdir}/milter/srsmilter
 %if %{use_systemd}
 %{_unitdir}/*
 %else
@@ -145,7 +146,7 @@ fi
 * Mon Nov 13 2017 Stuart Gathman <stuart@gathman.org> 1.0.3-1
 - Include srsmilter
 
-* Tue Nov  3 2017 Stuart Gathman <stuart@gathman.org> 1.0.2-1
+* Fri Nov  3 2017 Stuart Gathman <stuart@gathman.org> 1.0.2-1
 - Fix daemon to run in python2
 - Move daemons to /usr/libexec/milter so they get bin_t selinux label
 
