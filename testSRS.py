@@ -27,20 +27,80 @@
 # Translated to Python by stuart@bmsi.com
 # http://bmsi.com/python/milter.html
 #
+# Copyright (c) 2017 Stuart Gathman  All rights reserved.
 # Portions Copyright (c) 2004 Shevek. All rights reserved.
-# Portions Copyright (c) 2004 Business Management Systems. All rights reserved.
+# Portions Copyright (c) 2004,2006 Business Management Systems. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
 import unittest
+import Milter
+from Milter.test import TestBase
 from SRS.Guarded import Guarded
 from SRS.DB import DB
 from SRS.Reversible import Reversible
 from SRS.Daemon import Daemon
+import srsmilter
 import SRS
 import threading
 import socket
+try:
+  from StringIO import StringIO
+except:
+  from io import StringIO
+
+class TestMilter(TestBase,srsmilter.srsMilter):
+  def __init__(self):
+    TestBase.__init__(self)
+    srsmilter.config = srsmilter.Config(['pysrs.cfg'])
+    srsmilter.srsMilter.__init__(self)
+    self.setsymval('j','test.milter.org')
+
+class SRSMilterTestCase(unittest.TestCase):
+
+  msg = '''From: good@example.com
+Subject: test
+
+test
+'''
+
+  ## Test rejecting bounce spam
+  def testReject(self):
+    milter = TestMilter()
+    milter.conf.srs_domain = set(['example.com'])
+    milter.conf.srs_reject_spoofed = False
+    fp = StringIO(self.msg)
+    rc = milter.connect('testReject',ip='192.0.3.1')
+    self.assertEqual(rc,Milter.CONTINUE)
+    rc = milter.feedFile(fp,sender='',rcpt='good@example.org')
+    self.assertEqual(rc,Milter.CONTINUE)
+    milter.conf.srs_reject_spoofed = True
+    fp.seek(0)
+    rc = milter.feedFile(fp,sender='',rcpt='bad@example.com')
+    self.assertEqual(rc,Milter.REJECT)
+    milter.close()
+
+  ## Test SRS coding of MAIL FROM
+  def testSign(self):
+    milter = TestMilter()
+    milter.conf.signdomain = set(['example.com'])
+    milter.conf.miltersrs = True
+    fp = StringIO(self.msg)
+    rc = milter.connect('testSign',ip='192.0.3.1')
+    self.assertEqual(rc,Milter.CONTINUE)
+    fp.seek(0)
+    rc = milter.feedFile(fp,sender='good@example.com',rcpt='good@example.org')
+    self.assertEqual(rc,Milter.CONTINUE)
+    s = milter.conf.srs.reverse(milter._sender[1:-1])
+    self.assertEqual(s,'good@example.com')
+    # check that it doesn't happen when disabled
+    milter.conf.miltersrs = False
+    fp.seek(0)
+    rc = milter.feedFile(fp,sender='good@example.com',rcpt='good@example.org')
+    self.assertEqual(rc,Milter.CONTINUE)
+    self.assertEqual(milter._sender,'<good@example.com>')
+    milter.close()
 
 class SRSTestCase(unittest.TestCase):
   
@@ -191,7 +251,11 @@ class SRSTestCase(unittest.TestCase):
     self.assertEqual(addr2,orig)
     self.assertTrue(self.case_smashed)
 
-def suite(): return unittest.makeSuite(SRSTestCase,'test')
+def suite(): 
+  s = unittest.makeSuite(SRSTestCase,'test')
+  s.addTest(makeSuite(SRSMilterTestCase,'test'))
+  #s.addTest(doctest.DocTestSuite(bms))
+  return s
 
 if __name__ == '__main__':
     unittest.main()

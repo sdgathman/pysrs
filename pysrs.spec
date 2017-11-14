@@ -8,7 +8,7 @@
 
 Summary: Python SRS (Sender Rewriting Scheme) library
 Name: %{pythonbase}-pysrs
-Version: 1.0.2
+Version: 1.0.3
 Release: 1%{?dist}
 Source0: pysrs-%{version}.tar.gz
 License: Python license
@@ -73,9 +73,11 @@ cp pysrsprog.m4 $RPM_BUILD_ROOT/usr/share/sendmail-cf/hack
 mkdir -p $RPM_BUILD_ROOT/var/log/milter
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/milter
 cp -p pysrs.py $RPM_BUILD_ROOT%{_libexecdir}/milter/pysrs
+cp -p srsmilter.py $RPM_BUILD_ROOT%{_libexecdir}/milter/srsmilter
 %if %{use_systemd}
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 cp -p pysrs.service $RPM_BUILD_ROOT%{_unitdir}
+cp -p srsmilter.service $RPM_BUILD_ROOT%{_unitdir}
 %else
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 cp %{sysvinit} $RPM_BUILD_ROOT/etc/rc.d/init.d/pysrs
@@ -140,6 +142,9 @@ fi
 %endif
 
 %changelog
+* Mon Nov 13 2017 Stuart Gathman <stuart@gathman.org> 1.0.3-1
+- Include srsmilter
+
 * Tue Nov  3 2017 Stuart Gathman <stuart@gathman.org> 1.0.2-1
 - Fix daemon to run in python2
 - Move daemons to /usr/libexec/milter so they get bin_t selinux label

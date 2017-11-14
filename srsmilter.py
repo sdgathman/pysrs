@@ -1,7 +1,9 @@
-# A simple SRS milter for Sendmail-8.14/Postfix-?
-
+#!/usr/bin/python2
 #
-# INCOMPLETE!!
+# A simple SRS milter for Sendmail-8.14/Postfix-?
+#
+# NOTE: use with pysrs socketmap and sendmail-cf macro to handle
+# multiple recipients.
 #
 # The logical problem is that a milter gets to change MFROM only once for
 # multiple recipients.  When there is a conflict between recipients, we
@@ -12,8 +14,9 @@
 
 # http://www.sendmail.org/doc/sendmail-current/libmilter/docs/installation.html
 
-# Author: Stuart D. Gathman <stuart@bmsi.com>
+# Author: Stuart D. Gathman <stuart@gathman.org>
 # Copyright 2007 Business Management Systems, Inc.
+# Copyright 2017 Stuart D. Gathman
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
@@ -21,8 +24,8 @@ import SRS
 import SES
 import sys
 import Milter
-import spf
 import syslog
+import re
 from Milter.config import MilterConfigParser
 from Milter.utils import iniplist,parse_addr
 
@@ -33,27 +36,29 @@ class Config(object):
   def __init__(conf,cfglist):
     cp = MilterConfigParser()
     cp.read(cfglist)
-    if cp.has_option('milter','datadir'):
-      os.chdir(cp.get('milter','datadir'))      # FIXME: side effect!
-    conf.socketname = cp.getdefault('milter','socketname',
-        '/var/run/milter/pysrs')
-    conf.miltername = cp.getdefault('milter','name','pysrsfilter')
-    conf.trusted_relay = cp.getlist('milter','trusted_relay')
-    conf.internal_connect = cp.getlist('milter','internal_connect')
+    if cp.has_option('srsmilter','datadir'):
+      os.chdir(cp.get('srsmilter','datadir'))      # FIXME: side effect!
+    conf.socketname = cp.getdefault('srsmilter','socketname',
+        '/var/run/milter/srsmilter')
+    conf.miltername = cp.getdefault('srsmilter','name','pysrsfilter')
+    conf.trusted_relay = cp.getlist('srsmilter','trusted_relay')
+    conf.miltersrs = cp.getboolean('srsmilter','miltersrs')
+    conf.internal_connect = cp.getlist('srsmilter','internal_connect')
+    conf.srs_reject_spoofed = cp.getboolean('srsmilter','reject_spoofed')
     conf.trusted_forwarder = cp.getlist('srs','trusted_forwarder')
     conf.secret = cp.getdefault('srs','secret','shhhh!')
     conf.maxage = cp.getintdefault('srs','maxage',21)
     conf.hashlength = cp.getintdefault('srs','hashlength',5)
     conf.separator = cp.getdefault('srs','separator','=')
     conf.database = cp.getdefault('srs','database')
-    conf.srs_reject_spoofed = cp.getboolean('srs','reject_spoofed')
     conf.nosrsdomain = cp.getlist('srs','nosrs') # no SRS rcpt
     conf.banned_users = cp.getlist('srs','banned_users')
     conf.srs_domain = set(cp.getlist('srs','srs')) # check rcpt 
     conf.sesdomain = set(cp.getlist('srs','ses')) # sign from with ses
     conf.signdomain = set(cp.getlist('srs','sign')) # sign from with srs
     conf.fwdomain = cp.getdefault('srs','fwdomain',None) # forwarding domain
-    if database:
+    if conf.database:
+      global SRS
       import SRS.DB
       conf.srs = SRS.DB.DB(database=conf.database,secret=conf.secret,
         maxage=conf.maxage,hashlength=conf.hashlength,separator=conf.separator)
@@ -167,12 +172,12 @@ class srsMilter(Milter.Base):
       self.discard_list.append(rcpt)
 
   ## Accumulate added recipients to be applied in eom callback.
-  def add_recipient(self,rcpt):
+  def add_recipient(self,rcpt,params):
     rcpt = rcpt.lower()
-    if not rcpt in self.redirect_list:
-      self.redirect_list.append(rcpt)
+    if not rcpt in (r[0] for r in self.redirect_list):
+      self.redirect_list.append((rcpt,params))
 
-  def envrcpt(self,to,*str):
+  def envrcpt(self,to,*params):
     conf = self.conf
     t = parse_addr(to)
     if len(t) == 2:
@@ -193,10 +198,11 @@ class srsMilter(Milter.Base):
             newaddr = srs.reverse(oldaddr)
             self.log("srs rcpt:",newaddr)
           self.del_recipient(to)
-          self.add_recipient('<%s>',newaddr)
+          self.add_recipient('<%s>',newaddr,params)
         except:
           # no valid SRS signature
           if not (self.internal_connection or self.trusted_relay):
+            # reject specific recipients with bad sig
             if self.srsre.match(oldaddr):
               self.log("REJECT: srs spoofed:",oldaddr)
               self.setreply('550','5.7.1','Invalid SRS signature')
@@ -205,10 +211,11 @@ class srsMilter(Milter.Base):
               self.log("REJECT: ses spoofed:",oldaddr)
               self.setreply('550','5.7.1','Invalid SES signature')
               return Milter.REJECT
+            # reject message for any missing sig
             self.data_allowed = not conf.srs_reject_spoofed
       else:
         # sign "outgoing" from
-        if domain in nosrsdomain:
+        if domain in self.conf.nosrsdomain:
           self.nosrsrcpt.append(to)
         else:
           self.srsrcpt.append(to)
@@ -216,19 +223,33 @@ class srsMilter(Milter.Base):
       self.nosrsrcpt.append(to)
     return Milter.CONTINUE
 
+  def eoh(self):
+    if not self.data_allowed:
+      return Milter.REJECT
+    return Milter.CONTINUE
+
   def eom(self):
-    for name,val,idx in self.new_headers:
-      try:
-        self.addheader(name,val,idx)
-      except:
-        self.addheader(name,val)	# older sendmail can't insheader
+    # apply recipient changes
+    for to in self.discard_list:
+      self.delrcpt(to)
+    for to,p in self.redirect_list:
+      self.addrcpt(to,p)
+    # optionally, do outgoing SRS for all recipients
+    if self.conf.miltersrs and self.srsrcpt:
+      newaddr = self.make_srs(self.canon_from)
+      if newaddr != self.canon_from:
+        self.chgfrom(newaddr)
     return Milter.CONTINUE
 
 if __name__ == "__main__":
-  Milter.factory = srsMilter
-  Milter.set_flags(Milter.CHGFROM + Milter.DELRCPT)
   global config
-  config = Config(['spfmilter.cfg','/etc/mail/spfmilter.cfg'])
+  config = Config(['srsmilter.cfg','/etc/mail/srsmilter.cfg'])
+  Milter.factory = srsMilter
+  if config.miltersrs:
+    flags = Milter.CHGFROM + Milter.DELRCPT
+  else:
+    flags = Milter.DELRCPT
+  Milter.set_flags(Milter.CHGFROM + Milter.DELRCPT)
   miltername = config.miltername
   socketname = config.socketname
   print("""To use this with sendmail, add the following to sendmail.cf:
@@ -239,5 +260,5 @@ X%s,        S=local:%s
 See the sendmail README for libmilter.
 sample srsmilter startup""" % (miltername,miltername,socketname))
   sys.stdout.flush()
-  Milter.runmilter("pysrsfilter",socketname,240)
-  print("sample srsmilter shutdown")
+  Milter.runmilter(miltername,socketname,240)
+  print("srsmilter shutdown")
