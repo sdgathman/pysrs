@@ -42,7 +42,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 __all__= [
   'Base',
