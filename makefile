@@ -1,6 +1,6 @@
 web:
 	doxygen
-	rsync -ravK doc/html/ spidey2.bmsi.com:/Public/pymilter
+	rsync -ravK doc/html/ pymilter.org:/var/www/html/milter/pysrs
 
 VERSION=1.0.3
 PKG=pysrs-$(VERSION)

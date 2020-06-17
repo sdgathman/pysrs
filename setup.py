@@ -11,28 +11,23 @@ import sys,os
 
 sys.path.insert(0,os.getcwd())
 
-from distutils.core import setup
+from setuptools import setup
 
 import SRS
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
         #-- Package description
         name = 'pysrs',
         license = 'Python license',
-        version = '1.0.3',
+        version = '1.0.4',
         description = 'Python SRS (Sender Rewriting Scheme) library',
-        long_description = """Python SRS (Sender Rewriting Scheme) library.
-As SPF is implemented, MTAs that check SPF must account for any forwarders.
-One way to handle forwarding is to have the forwarding MTA rewrite envfrom to a
-domain they are authorized to use.
-
-See http://www.openspf.org/SRS for details.
-The Perl reference implementation and a C implementation are at
-http://www.libsrs2.org/
-""",
+        long_description = long_description,
         author = 'Stuart Gathman (Perl version by Shevek)', 
         author_email = 'stuart@gathman.org',
-        url = 'http://pythonhosted.org/milter/pysrs.html',
+        url = 'https://pymilter.org/milter/pysrs.html',
         py_modules = ['SocketMap'],
         packages = ['SRS','SES'],
         scripts = ['envfrom2srs.py','srs2envtol.py'],

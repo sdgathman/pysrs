@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 #
 # A simple SRS milter for Sendmail-8.14/Postfix-?
 #
@@ -67,14 +67,12 @@ class Config(object):
         maxage=conf.maxage,hashlength=conf.hashlength,separator=conf.separator)
     if SES:
       conf.ses = SES.new(secret=conf.secret,expiration=conf.maxage)
-      conf.srs_domain = set(conf.sesdomain)
-      conf.srs_domain.update(conf.srs_domain)
-    else:
-      conf.srs_domain = set(conf.srs_domain)
+      conf.srs_domain.update(conf.sesdomain)
     conf.srs_domain.update(conf.signdomain)
     if conf.fwdomain:
       conf.srs_domain.add(conf.fwdomain)
 
+@Milter.rejected_recipients
 class srsMilter(Milter.Base):
   "Milter to check SRS.  Each connection gets its own instance."
 
@@ -185,9 +183,10 @@ class srsMilter(Milter.Base):
       user,domain = t
       if self.is_bounce and domain in conf.srs_domain:
         # require valid signed recipient
-        oldaddr = '@'.join(parse_addr(to))
+        oldaddr = '@'.join(t)
         try:
           if conf.ses:
+            ses = self.conf.ses
             newaddr = ses.verify(oldaddr)
           else:
             newaddr = oldaddr,
@@ -195,10 +194,11 @@ class srsMilter(Milter.Base):
             newaddr = newaddr[0]
             self.log("ses rcpt:",newaddr)
           else:
+            srs = self.conf.srs
             newaddr = srs.reverse(oldaddr)
             self.log("srs rcpt:",newaddr)
           self.del_recipient(to)
-          self.add_recipient('<%s>',newaddr,params)
+          self.add_recipient('<%s>'%newaddr,params)
         except:
           # no valid SRS signature
           if not (self.internal_connection or self.trusted_relay):
@@ -238,12 +238,14 @@ class srsMilter(Milter.Base):
     if self.conf.miltersrs and self.srsrcpt:
       newaddr = self.make_srs(self.canon_from)
       if newaddr != self.canon_from:
+        self.log("srs mail from:",newaddr)
         self.chgfrom(newaddr)
     return Milter.CONTINUE
 
 if __name__ == "__main__":
   global config
   config = Config(['pysrs.cfg','/etc/mail/pysrs.cfg'])
+  # FIXME: print helpful error if receiver missing from sendmail config
   Milter.factory = srsMilter
   if config.miltersrs:
     flags = Milter.CHGFROM + Milter.DELRCPT

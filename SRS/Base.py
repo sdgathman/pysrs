@@ -247,7 +247,7 @@ and there may be collision problems with sender addresses)."""
     h = hmac.new(secret[0].encode(),b'',sha)
     for i in data:
       h.update(i.lower())
-    hash = base64.encodestring(h.digest())
+    hash = base64.encodebytes(h.digest())
     return hash[:self.hashlength]
 
   def hash_verify(self,hash,*data):
@@ -266,7 +266,7 @@ with an old secret."""
       h = hmac.new(s.encode(),b'',sha)
       for i in data:
         h.update(i.lower())
-      valid = base64.encodestring(h.digest())[:len(hash)]
+      valid = base64.encodebytes(h.digest())[:len(hash)]
       # We test all case sensitive matches before case insensitive
       # matches. While the risk of a case insensitive collision is
       # quite low, we might as well be careful.

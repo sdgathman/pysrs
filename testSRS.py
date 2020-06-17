@@ -46,9 +46,9 @@ import SRS
 import threading
 import socket
 try:
-  from StringIO import StringIO
+  from io import BytesIO
 except:
-  from io import StringIO
+  from StringIO import StringIO as BytesIO
 
 class TestMilter(TestBase,srsmilter.srsMilter):
   def __init__(self):
@@ -59,7 +59,7 @@ class TestMilter(TestBase,srsmilter.srsMilter):
 
 class SRSMilterTestCase(unittest.TestCase):
 
-  msg = '''From: good@example.com
+  msg = b'''From: good@example.com
 Subject: test
 
 test
@@ -70,7 +70,7 @@ test
     milter = TestMilter()
     milter.conf.srs_domain = set(['example.com'])
     milter.conf.srs_reject_spoofed = False
-    fp = StringIO(self.msg)
+    fp = BytesIO(self.msg)
     rc = milter.connect('testReject',ip='192.0.3.1')
     self.assertEqual(rc,Milter.CONTINUE)
     rc = milter.feedFile(fp,sender='',rcpt='good@example.org')
@@ -86,7 +86,7 @@ test
     milter = TestMilter()
     milter.conf.signdomain = set(['example.com'])
     milter.conf.miltersrs = True
-    fp = StringIO(self.msg)
+    fp = BytesIO(self.msg)
     rc = milter.connect('testSign',ip='192.0.3.1')
     self.assertEqual(rc,Milter.CONTINUE)
     fp.seek(0)

@@ -11,7 +11,10 @@
 
 import SRS
 import re
-from ConfigParser import ConfigParser, DuplicateSectionError
+try:
+  from configparser import ConfigParser, DuplicateSectionError
+except:
+  from ConfigParser import ConfigParser, DuplicateSectionError
 
 # get SRS parameters from milter configuration
 cp = ConfigParser({

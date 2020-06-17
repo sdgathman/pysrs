@@ -1,4 +1,4 @@
-#!/usr/bin/python2.3
+#!/usr/bin/python3
 # sendmail program map for SRS
 #
 # Use only if absolutely necessary.  It is *very* inefficient and
@@ -11,7 +11,10 @@
 
 import SRS
 import re
-from ConfigParser import ConfigParser, DuplicateSectionError
+try:
+  from configparser import ConfigParser, DuplicateSectionError
+except:
+  from ConfigParser import ConfigParser, DuplicateSectionError
 
 # get SRS parameters from milter configuration
 cp = ConfigParser({

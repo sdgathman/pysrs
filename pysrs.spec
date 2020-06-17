@@ -1,8 +1,3 @@
-%if 0%{?rhel} == 6
-%global __python python2.6
-%global sysvinit pysrs.rc
-%endif
-
 %global pythonbase python
 %global use_systemd 1
 
@@ -16,10 +11,10 @@ Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
-BuildRequires: python >= 2.6
+BuildRequires: python >= 3.6
 Vendor: Stuart Gathman (Perl version by Shevek) <stuart@bmsi.com>
 Packager: Stuart D. Gathman <stuart@bmsi.com>
-Requires: %{pythonbase} sendmail sendmail-cf
+Requires: %{pythonbase} sendmail sendmail-cf python-pymilter
 
 %if %{use_systemd}
 # systemd macros are not defined unless systemd is present
@@ -91,6 +86,7 @@ q
 EOF
 %endif
 
+%if !%{use_systemd}
 # logfile rotation
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 cat >$RPM_BUILD_ROOT/etc/logrotate.d/pysrs <<'EOF'
@@ -99,6 +95,7 @@ cat >$RPM_BUILD_ROOT/etc/logrotate.d/pysrs <<'EOF'
   compress
 }
 EOF
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -143,6 +140,10 @@ fi
 %endif
 
 %changelog
+* Mon Nov 13 2017 Stuart Gathman <stuart@gathman.org> 1.0.4-1
+- Python3 update
+- drop EL6 support
+
 * Mon Nov 13 2017 Stuart Gathman <stuart@gathman.org> 1.0.3-1
 - Include srsmilter
 
