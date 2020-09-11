@@ -1,25 +1,5 @@
-# $Log$
-# Revision 1.2  2006/02/16 05:16:58  customdesigned
-# Support SRS signing mode.
 #
-# Revision 1.1.1.2  2005/06/03 04:13:55  customdesigned
-# Support sendmail socketmap
-#
-# Revision 1.4  2004/08/26 03:31:38  stuart
-# Introduce sendmail socket map
-#
-# Revision 1.3  2004/03/25 00:02:21  stuart
-# FIXME where case smash test depends on day
-#
-# Revision 1.2  2004/03/22 18:20:00  stuart
-# Read config for sendmail maps from /etc/mail/pysrs.cfg
-#
-# Revision 1.1.1.1  2004/03/19 05:23:13  stuart
-# Import to CVS
-#
-#
-# AUTHOR
-# Shevek
+# Original AUTHOR: Shevek
 # CPAN ID: SHEVEK
 # cpan@anarres.org
 # http://www.anarres.org/projects/
@@ -27,9 +7,10 @@
 # Translated to Python by stuart@bmsi.com
 # http://bmsi.com/python/milter.html
 #
-# Copyright (c) 2017 Stuart Gathman  All rights reserved.
+# Copyright (c) 2017,2020 Stuart Gathman  All rights reserved.
 # Portions Copyright (c) 2004 Shevek. All rights reserved.
-# Portions Copyright (c) 2004,2006 Business Management Systems. All rights reserved.
+# Portions Copyright (c) 2004,2006 Business Management Systems. All rights
+# reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Python itself.
@@ -42,7 +23,7 @@ from SRS.DB import DB
 from SRS.Reversible import Reversible
 from SRS.Daemon import Daemon
 import srsmilter
-import SRS
+import SRS,SES
 import threading
 import socket
 try:
@@ -56,6 +37,45 @@ class TestMilter(TestBase,srsmilter.srsMilter):
     srsmilter.config = srsmilter.Config(['pysrs.cfg'])
     srsmilter.srsMilter.__init__(self)
     self.setsymval('j','test.milter.org')
+
+class SocketMap(object):
+  def __init__(self,sockname):
+    self.sockname = sockname
+    self.sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    self.sock.connect(self.sockname)
+    self.rfile = self.sock.makefile('rb')
+
+  def _readlen(self,maxlen=8):
+    ch = self.rfile.read(1)
+    n = b''
+    while ch != b':':
+      if not ch:
+        raise EOFError
+      if not ch in b'0123456789':
+        print('n =',n,'ch =',ch)
+        raise ValueError
+      if len(n) >= maxlen:
+        raise OverflowError
+      n += ch
+      ch = self.rfile.read(1)
+    return int(n)
+
+  def sendmap(self,mapname,*args):
+    # Sample req: 'make_srs unilit.us.\x9bstuart<@gathman.org.>'
+    s = mapname.encode() + b' '+b'\x9b'.join(s.encode() for s in args)
+    self.sock.send(b'%d:%s,' % (len(s),s))
+    n = self._readlen()
+    res = self.rfile.read(n)
+    ch = self.rfile.read(1)
+    if ch == b',':
+      return res.decode().split(' ',1)
+    if ch == b'':
+      raise EOFError
+    raise ValueError
+
+  def close(self):
+    self.rfile.close()
+    self.sock.close()
 
 class SRSMilterTestCase(unittest.TestCase):
 
@@ -216,6 +236,7 @@ class SRSTestCase(unittest.TestCase):
   def run2(self): # handle two requests
     self.daemon.server.handle_request()
     self.daemon.server.handle_request()
+    self.daemon.server.server_close()
 
   def sendcmd(self,*args):
     sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
@@ -225,7 +246,7 @@ class SRSTestCase(unittest.TestCase):
     sock.close()
     return res
 
-  def testExim(self,sockname='/tmp/srsd',secret="shhhh!"):
+  def testExim(self,sockname='/tmp/exsrsd',secret="shhhh!"):
     self.sockname = sockname
     self.daemon = Daemon(socket=sockname,secret=secret)
     server = threading.Thread(target=self.run2,name='srsd')
@@ -234,6 +255,22 @@ class SRSTestCase(unittest.TestCase):
     srsaddr = self.sendcmd(b'FORWARD',sender,b'second.com')
     addr = self.sendcmd(b'REVERSE',srsaddr)
     server.join()
+    self.assertEqual(sender,addr)
+
+  def testSocketMap(self,sockname='/tmp/srsd',secret="shhhh!"):
+    import pysrs,subprocess,time
+    print()
+    with subprocess.Popen(['./pysrs.py','test/pysrs.cfg']) as p:
+      time.sleep(1)
+      try:
+        m = SocketMap('/tmp/srsd')
+        sender = 'mouse<@orig.com.>'
+        # Sample req: 'make_srs unilit.us.\x9bstuart<@gathman.org.>'
+        res,srsaddr = m.sendmap('make-srs','second.com',sender)
+        res,addr = m.sendmap('reverse-srs',srsaddr)
+      finally: m.close()
+      p.terminate()
+    self.assertEqual('OK',res)
     self.assertEqual(sender,addr)
 
   def testProgMap(self):
@@ -258,4 +295,11 @@ def suite():
   return s
 
 if __name__ == '__main__':
+  from sys import argv
+  if len(argv) < 3:
     unittest.main()
+  else:
+    m = SocketMap('/tmp/srsd')
+    r = m.sendmap(argv[1],*argv[2:])
+    print(r)
+    m.close()

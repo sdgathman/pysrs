@@ -37,7 +37,7 @@ class SRSHandler(SocketMap.Handler):
   #
   # We need to preprocess it some:
   def _handle_make_srs(self,old_address):
-    a = old_address.split('\x9b')
+    a = [s.decode() for s in old_address.split(b'\x9b')]
     if len(a) == 2:
       h,old_address = a
       self.log('h =',h)
@@ -86,6 +86,7 @@ class SRSHandler(SocketMap.Handler):
     # Munge ParseLocal recipient in the same manner as required
     # in EnvFromSMTP.
 
+    old_address = old_address.decode()
     use_address = self.bracketRE.sub('',old_address)
     use_address = self.traildotRE.sub('',use_address)
 
@@ -120,7 +121,7 @@ def main(args):
     'separator': '=',
     'socket': '/var/run/milter/pysrs'
   })
-  cp.read(["/etc/mail/pysrs.cfg"])
+  cp.read(args+["/etc/mail/pysrs.cfg"])
   try:
     cp.add_section('srs')
   except DuplicateSectionError:
@@ -141,7 +142,10 @@ def main(args):
     os.remove(socket)
   except: pass
   daemon = SocketMap.Daemon(socket,SRSHandler)
-  daemon.server.fwdomain = cp.get('srs','fwdomain',None)
+  if cp.has_option('srs','fwdomain'):
+    daemon.server.fwdomain = cp.get('srs','fwdomain')
+  else:
+    daemon.server.fwdomain = None
   daemon.server.sesdomain = ()
   daemon.server.signdomain = ()
   daemon.server.nosrsdomain = ()

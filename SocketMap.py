@@ -19,23 +19,23 @@ class Handler(socketserver.StreamRequestHandler):
 
   def write(self,s):
     "write netstring to socket"
-    self.wfile.write('%d:%s,' % (len(s),s))
+    self.wfile.write(b'%d:%s,' % (len(s),s.encode()))
     self.log(s)
 
   def _readlen(self,maxlen=8):
     "read netstring length from socket"
-    n = ""
-    file = self.rfile
-    ch = file.read(1)
-    while ch != ":":
+    n = b''
+    rfile = self.rfile
+    ch = rfile.read(1)
+    while ch != b':':
       if not ch:
         raise EOFError
-      if not ch in "0123456789":
+      if not ch in b'0123456789':
         raise ValueError
       if len(n) >= maxlen:
         raise OverflowError
       n += ch
-      ch = file.read(1)
+      ch = rfile.read(1)
     return int(n)
 
   def read(self, maxlen=None):
@@ -46,9 +46,9 @@ class Handler(socketserver.StreamRequestHandler):
     file = self.rfile
     s = file.read(n)
     ch = file.read(1)
-    if ch == ',':
+    if ch == b',':
       return s
-    if ch == "":
+    if ch == b'':
       raise EOFError
     raise ValueError
 
@@ -57,12 +57,12 @@ class Handler(socketserver.StreamRequestHandler):
     while True:
       try:
         line = self.read()
-        self.log(line)
-        args = line.split(' ',1)
-        map = args.pop(0).replace('-','_')
-        meth = getattr(self, '_handle_' + map, None)
+        self.log(repr(line))
+        args = line.split(b' ',1)
+        mapname = args.pop(0).decode().replace('-','_')
+        meth = getattr(self, '_handle_' + mapname, None)
         if not map:
-          raise ValueError("Unrecognized map: %s" % map)
+          raise ValueError("Unrecognized map: %s" % mapname)
         res = meth(*args)
         self.write('OK ' + res)
       except EOFError:

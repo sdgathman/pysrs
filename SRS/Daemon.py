@@ -61,12 +61,11 @@ class Daemon(object):
     if secretfile and os.path.exists(secretfile):
       assert os.path.isfile(secretfile) and os.access(secretfile,os.R_OK), \
         "Secret file $secretfile not readable"
-      FH = open(secretfile)
-      for ln in FH:
-        if not ln: continue
-        if ln.startswith('#'): continue
-        secrets += ln
-      FH.close()
+      with open(secretfile) as FH:
+        for ln in FH:
+          if not ln: continue
+          if ln.startswith('#'): continue
+          secrets += ln
 
     assert secrets, \
       """No secret or secretfile given. Use --secret or --secretfile,
