@@ -76,7 +76,7 @@ class Handler(socketserver.StreamRequestHandler):
       except LookupError as x:
         self.write("NOTFOUND")
       except Exception as x:
-        #print x
+        #print(x)
         self.write("TEMP %s"%x)
       # PERM,TIMEOUT
 

@@ -260,16 +260,17 @@ class SRSTestCase(unittest.TestCase):
   def testSocketMap(self,sockname='/tmp/srsd',secret="shhhh!"):
     import pysrs,subprocess,time
     print()
-    with subprocess.Popen(['./pysrs.py','test/pysrs.cfg']) as p:
-      time.sleep(1)
-      try:
-        m = SocketMap('/tmp/srsd')
-        sender = 'mouse<@orig.com.>'
-        # Sample req: 'make_srs unilit.us.\x9bstuart<@gathman.org.>'
-        res,srsaddr = m.sendmap('make-srs','second.com',sender)
-        res,addr = m.sendmap('reverse-srs',srsaddr)
-      finally: m.close()
-      p.terminate()
+    with open('test/pysrs.log','w') as fp:
+      with subprocess.Popen(['./pysrs.py','test/pysrs.cfg'],stdout=fp) as p:
+        time.sleep(1)
+        try:
+          m = SocketMap('/tmp/srsd')
+          sender = 'mouse<@orig.com.>'
+          # Sample req: 'make_srs unilit.us.\x9bstuart<@gathman.org.>'
+          res,srsaddr = m.sendmap('make-srs','second.com',sender)
+          res,addr = m.sendmap('reverse-srs',srsaddr)
+        finally: m.close()
+        p.terminate()
     self.assertEqual('OK',res)
     self.assertEqual(sender,addr)
 
