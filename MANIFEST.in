@@ -1,5 +1,4 @@
 include testSRS.py
-include testd.py
 include pysrs.html
 include envfrom2srs.py
 include srs2envtol.py

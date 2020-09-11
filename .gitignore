@@ -1,1 +1,4 @@
 *.pyc
+MANIFEST
+dist
+test/milter.log
