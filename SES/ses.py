@@ -46,6 +46,7 @@ import hmac
 try: from hashlib import sha1 as sha
 except: import sha
 import struct
+import syslog
 
 DAY = 24*60*60	# size of day
 
@@ -130,7 +131,7 @@ class SES(object):
     return int(s / self.frac_day)
 
   def warn(self,*msg):
-    print('WARNING:',' '.join(msg), file=sys.stderr)
+     syslog.syslog('WARNING: ' + ' '.join(msg))
 
   def set_secret(self,*args):
     """ses.set_secret(new,old,...)
