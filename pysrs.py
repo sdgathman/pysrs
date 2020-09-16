@@ -157,6 +157,7 @@ def main(args):
     
   daemon.server.srs = srs
   daemon.server.ses = ses
+  syslog.openlog('pysrs.py',0,syslog.LOG_MAIL)
   syslog.syslog('pysrs: started')
   sys.stdout.flush()
   daemon.run()
