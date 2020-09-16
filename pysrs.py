@@ -17,15 +17,12 @@ except:
 import SocketMap
 import time
 import sys
+import syslog
 
 class SRSHandler(SocketMap.Handler):
 
   def log(self,*msg):
-    # print "%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S'),self.id),
-    print("%s" % (time.strftime('%Y%b%d %H:%M:%S'),), end=' ')
-    for i in msg: print(i, end=' ')
-    print()
-    sys.stdout.flush()
+     syslog.syslog(' '.join(msg))
 
   bracketRE = re.compile(r'[<>]')
   traildotRE = re.compile(r'\.$')
@@ -37,7 +34,7 @@ class SRSHandler(SocketMap.Handler):
   #
   # We need to preprocess it some:
   def _handle_make_srs(self,old_address):
-    a = [s.decode() for s in old_address.split(b'\x9b')]
+    a = [s for s in old_address.split('\x9b')]
     if len(a) == 2:
       h,old_address = a
       self.log('h =',h)
@@ -86,7 +83,6 @@ class SRSHandler(SocketMap.Handler):
     # Munge ParseLocal recipient in the same manner as required
     # in EnvFromSMTP.
 
-    old_address = old_address.decode()
     use_address = self.bracketRE.sub('',old_address)
     use_address = self.traildotRE.sub('',use_address)
 
@@ -161,10 +157,11 @@ def main(args):
     
   daemon.server.srs = srs
   daemon.server.ses = ses
-  print("%s pysrs startup" % time.strftime('%Y%b%d %H:%M:%S'))
+  syslog.openlog('pysrs.py',0,syslog.LOG_MAIL)
+  syslog.syslog('pysrs: started')
   sys.stdout.flush()
   daemon.run()
-  print("%s pysrs shutdown" % time.strftime('%Y%b%d %H:%M:%S'))
+  syslog.syslog('pysrs: shutdown')
 
 if __name__ == "__main__":
   main(sys.argv[1:])

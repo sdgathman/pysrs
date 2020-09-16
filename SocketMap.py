@@ -58,10 +58,10 @@ class Handler(socketserver.StreamRequestHandler):
       try:
         line = self.read()
         self.log(repr(line))
-        args = line.split(b' ',1)
-        mapname = args.pop(0).decode().replace('-','_')
+        args = line.decode().split(' ',1)
+        mapname = args.pop(0).replace('-','_')
         meth = getattr(self, '_handle_' + mapname, None)
-        if not map:
+        if not meth:
           raise ValueError("Unrecognized map: %s" % mapname)
         res = meth(*args)
         self.write('OK ' + res)
