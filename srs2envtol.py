@@ -1,4 +1,4 @@
-#!/usr/bin/python2.3
+#!/usr/bin/env python3
 # sendmail program map for SRS
 #
 # Use only if absolutely necessary.  It is *very* inefficient and
